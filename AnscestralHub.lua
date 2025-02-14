@@ -1,10 +1,10 @@
-if getgenv().cuppink then warn("Ancestral Hub: Already executed!") return end
-getgenv().cuppink = true
+if getgenv().ancestral then warn("Ancestral Hub: Already executed!") return end
+getgenv().ancestral = true
 
 if not game:IsLoaded() then
     game.Loaded:Wait()
 end
--- loadstring(game:HttpGet("https://raw.githubusercontent.com/isMoons/loader/refs/heads/main/AnscestralHub.lua"))()
+-- loadstring(game:HttpGet("https://raw.githubusercontent.com/isMoons/loader/refs/heads/main/AnscestralHub.lua?token=GHSAT0AAAAAAC5GEQ4NDZSS5K3BBIYKDO7WZ5PDJMQ"))()
 local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
 local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
 local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
