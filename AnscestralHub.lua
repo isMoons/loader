@@ -4,7 +4,7 @@ getgenv().cuppink = true
 if not game:IsLoaded() then
     game.Loaded:Wait()
 end
-
+-- loadstring(game:HttpGet("https://raw.githubusercontent.com/isMoons/loader/refs/heads/main/AnscestralHub.lua"))()
 local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
 local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
 local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
@@ -64,7 +64,7 @@ if DeviceType == "Mobile" then
 end
 
 local Window = Fluent:CreateWindow({
-    Title = game:GetService("MarketplaceService"):GetProductInfo(16732694052).Name .." | Ancestral - BETA",
+    Title = game:GetService("MarketplaceService"):GetProductInfo(16732694052).Name .." | Ancestral - BETA By isMoonss",
     SubTitle = "https://discord.gg/NxWyyfVbwp",
     TabWidth = 160,
     Size = UDim2.fromOffset(580, 460),
