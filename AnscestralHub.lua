@@ -1,77 +1,139 @@
-if getgenv().ancestral then warn("Ancestral Hub: Already executed!") return end
+if getgenv().ancestral then 
+    warn("Ancestral Hub: Already executed!") 
+    return 
+end
 getgenv().ancestral = true
 
 if not game:IsLoaded() then
     game.Loaded:Wait()
 end
--- loadstring(game:HttpGet("https://raw.githubusercontent.com/isMoons/loader/refs/heads/main/AnscestralHub.lua?token=GHSAT0AAAAAAC5GEQ4NDZSS5K3BBIYKDO7WZ5PDJMQ"))()
+
+local TweenService = game:GetService("TweenService")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+-- GUI awal
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+-- Teks "Ancestral"
+local TextLabel = Instance.new("TextLabel")
+TextLabel.Parent = ScreenGui
+TextLabel.Size = UDim2.new(0.3, 0, 0.05, 0) -- 30% dari lebar layar, 5% dari tinggi layar (supaya tidak terlalu besar)
+TextLabel.Position = UDim2.new(0.5, 0, 0.5, 0) -- Posisi di tengah
+TextLabel.AnchorPoint = Vector2.new(0.5, 0.5) -- Supaya perbesarannya dari tengah
+TextLabel.BackgroundTransparency = 1
+TextLabel.Font = Enum.Font.GothamBold
+TextLabel.TextScaled = true -- Ukuran teks otomatis menyesuaikan
+TextLabel.TextStrokeTransparency = 0.2
+TextLabel.TextColor3 = Color3.fromRGB(0, 191, 255) -- Light Blue
+TextLabel.TextTransparency = 1
+TextLabel.Text = "Ancestral"
+
+-- Tween untuk fade-in + perbesaran teks
+local growTween = TweenService:Create(TextLabel, TweenInfo.new(1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+    Size = UDim2.new(0.35, 0, 0.08, 0), -- Sedikit lebih besar tapi tetap dalam batas aman
+    TextTransparency = 0
+})
+growTween:Play()
+
+-- Setelah membesar, teks akan turun ke bawah
+growTween.Completed:Connect(function()
+    local moveTween = TweenService:Create(TextLabel, TweenInfo.new(1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+        Position = UDim2.new(0.5, 0, 0.75, 0) -- Pindah ke bawah
+    })
+    moveTween:Play()
+    
+    -- Setelah beberapa detik, mulai animasi fade-out
+    task.delay(3, function()
+        local fadeOutTween = TweenService:Create(TextLabel, TweenInfo.new(1.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            TextTransparency = 1
+        })
+        fadeOutTween:Play()
+        fadeOutTween.Completed:Wait()
+        
+        -- Hapus GUI setelah animasi selesai
+        ScreenGui:Destroy()
+    end)
+end)
+
+-- Load UI utama Fluent
 local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
 local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
 local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
 
-local DeviceType = game:GetService("UserInputService").TouchEnabled and "Mobile" or "PC"
-if DeviceType == "Mobile" then
-    local ClickButton = Instance.new("ScreenGui")
-    local MainFrame = Instance.new("Frame")
-    local ImageLabel = Instance.new("ImageLabel")
-    local TextButton = Instance.new("TextButton")
-    local UICorner = Instance.new("UICorner")
-    local UICorner_2 = Instance.new("UICorner")
+-- GUI untuk tombol minimize (akan muncul di PC & Mobile)
+local ClickButton = Instance.new("ScreenGui")
+local MainFrame = Instance.new("Frame")
+local ImageLabel = Instance.new("ImageLabel")
+local TextButton = Instance.new("TextButton")
+local UICorner = Instance.new("UICorner")
+local UISizeConstraint = Instance.new("UISizeConstraint") -- Untuk batasi ukuran di Mobile
 
-    ClickButton.Name = "ClickButton"
-    ClickButton.Parent = game.CoreGui
-    ClickButton.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ClickButton.Name = "ClickButton"
+ClickButton.Parent = game.CoreGui
+ClickButton.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ClickButton.ResetOnSpawn = false -- Agar tidak hilang saat reset karakter
 
-    MainFrame.Name = "MainFrame"
-    MainFrame.Parent = ClickButton
-    MainFrame.AnchorPoint = Vector2.new(1, 0)
-    MainFrame.BackgroundTransparency = 0.8
-    MainFrame.BackgroundColor3 = Color3.fromRGB(38, 38, 38) 
-    MainFrame.BorderSizePixel = 0
-    MainFrame.Position = UDim2.new(1, -60, 0, 10)
-    MainFrame.Size = UDim2.new(0, 45, 0, 45)
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = ClickButton
+MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+MainFrame.BackgroundTransparency = 0
+MainFrame.BackgroundColor3 = Color3.fromRGB(38, 38, 38)
+MainFrame.BorderSizePixel = 0
+MainFrame.Position = UDim2.new(0.1, 0, 0.2, 0) -- Agak di pojok kiri atas
+MainFrame.Size = UDim2.new(0.1, 0, 0.1, 0) -- 10% dari layar agar tetap proporsional
+MainFrame.Active = true
+MainFrame.Draggable = true -- Bisa dipindahkan
 
-    UICorner.CornerRadius = UDim.new(1, 0)
-    UICorner.Parent = MainFrame
+UICorner.CornerRadius = UDim.new(0, 10) -- Bikin kotak dengan sudut sedikit melengkung
+UICorner.Parent = MainFrame
 
-    UICorner_2.CornerRadius = UDim.new(0, 10)
-    UICorner_2.Parent = ImageLabel
+UISizeConstraint.Parent = MainFrame
+UISizeConstraint.MaxSize = Vector2.new(70, 70) -- Agar tidak terlalu besar di Mobile
 
-    ImageLabel.Parent = MainFrame
-    ImageLabel.AnchorPoint = Vector2.new(0.5, 0.5)
-    ImageLabel.BackgroundColor3 = Color3.new(0, 0, 0)
-    ImageLabel.BorderSizePixel = 0
-    ImageLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
-    ImageLabel.Size = UDim2.new(0, 45, 0, 45)
-    ImageLabel.Image = "rbxassetid://86528111707523"
+ImageLabel.Parent = MainFrame
+ImageLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+ImageLabel.BackgroundTransparency = 1
+ImageLabel.BorderSizePixel = 0
+ImageLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
+ImageLabel.Size = UDim2.new(0.8, 0, 0.8, 0) -- Ukuran tetap agar tidak berubah
+ImageLabel.Image = "rbxassetid://73407780444753" -- Ganti dengan ID logo minimize
+ImageLabel.ScaleType = Enum.ScaleType.Fit -- Mencegah gambar melar
 
-    TextButton.Parent = MainFrame
-    TextButton.BackgroundColor3 = Color3.new(1, 1, 1)
-    TextButton.BackgroundTransparency = 1
-    TextButton.BorderSizePixel = 0
-    TextButton.Position = UDim2.new(0, 0, 0, 0)
-    TextButton.Size = UDim2.new(0, 45, 0, 45)
-    TextButton.AutoButtonColor = false
-    TextButton.Font = Enum.Font.SourceSans
-    TextButton.Text = "Open"
-    TextButton.TextColor3 = Color3.new(220, 125, 255)
-    TextButton.TextSize = 20
+TextButton.Parent = MainFrame
+TextButton.BackgroundTransparency = 1
+TextButton.BorderSizePixel = 0
+TextButton.Size = UDim2.new(1, 0, 1, 0)
+TextButton.AutoButtonColor = false
 
-    TextButton.MouseButton1Click:Connect(function()
-        game:GetService("VirtualInputManager"):SendKeyEvent(true, "LeftControl", false, game)
-        game:GetService("VirtualInputManager"):SendKeyEvent(false, "LeftControl", false, game)
-    end)
-end
+-- Variabel untuk cek status minimize
+local isMinimized = false
 
+TextButton.MouseButton1Click:Connect(function()
+    isMinimized = not isMinimized -- Toggle antara minimize dan open
+    
+    game:GetService("VirtualInputManager"):SendKeyEvent(true, "LeftControl", false, game)
+    game:GetService("VirtualInputManager"):SendKeyEvent(false, "LeftControl", false, game)
+
+    if isMinimized then
+        ImageLabel.Image = "rbxassetid://73407780444753" -- Logo minimize
+    else
+        ImageLabel.Image = "rbxassetid://73407780444753" -- Logo open
+    end
+end)
+
+-- UI utama menggunakan Fluent
 local Window = Fluent:CreateWindow({
-    Title = game:GetService("MarketplaceService"):GetProductInfo(16732694052).Name .." | Ancestral - BETA By isMoonss",
+    Title = game:GetService("MarketplaceService"):GetProductInfo(16732694052).Name .."  | Ancestral v1.0",
     SubTitle = "https://discord.gg/NxWyyfVbwp",
     TabWidth = 160,
-    Size = UDim2.fromOffset(580, 460),
+    Size = UDim2.fromOffset(520, 400), -- Ukuran lebih kecil agar lebih responsif
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
-    Theme = "Rose",
-    MinimizeKey = Enum.KeyCode.LeftControl -- Used when theres no MinimizeKeybind
+    Theme = "Amethyst",
+    MinimizeKey = Enum.KeyCode.LeftControl -- Used when there's no MinimizeKeybind
 })
+
 
 -- // // // Services // // // --
 local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -102,7 +164,6 @@ local RenderStepped = RunService.RenderStepped
 local WaitForSomeone = RenderStepped.Wait
 
 -- // // // Features List // // // --
-
 
 -- // // // Variables // // // --
 local CastMode = "Legit"
@@ -193,43 +254,50 @@ end
 -- // // // Auto Shake // // // --
 local autoShakeEnabled = false
 local autoShakeConnection
+
 local function autoShake()
     if ShakeMode == "Navigation" then
-        task.wait()
         xpcall(function()
             local shakeui = PlayerGui:FindFirstChild("shakeui")
             if not shakeui then return end
+
             local safezone = shakeui:FindFirstChild("safezone")
             local button = safezone and safezone:FindFirstChild("button")
-            task.wait(0.2)
+
+            task.wait(0.05) -- Mempercepat jeda waktu
             GuiService.SelectedObject = button
+
             if GuiService.SelectedObject == button then
                 VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
                 VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
             end
-            task.wait(0.1)
+
+            task.wait(0.03) -- Mempercepat delay
             GuiService.SelectedObject = nil
-        end,function (err)
-        end)
+        end, function(err) end)
+
     elseif ShakeMode == "Mouse" then
-        task.wait()
         xpcall(function()
             local shakeui = PlayerGui:FindFirstChild("shakeui")
             if not shakeui then return end
+
             local safezone = shakeui:FindFirstChild("safezone")
             local button = safezone and safezone:FindFirstChild("button")
+            if not button then return end
+
             local pos = button.AbsolutePosition
             local size = button.AbsoluteSize
+
+            -- Klik lebih cepat dengan jeda yang lebih pendek
             VirtualInputManager:SendMouseButtonEvent(pos.X + size.X / 2, pos.Y + size.Y / 2, 0, true, LocalPlayer, 0)
             VirtualInputManager:SendMouseButtonEvent(pos.X + size.X / 2, pos.Y + size.Y / 2, 0, false, LocalPlayer, 0)
-        end,function (err)
-        end)
+        end, function(err) end)
     end
 end
 
 local function startAutoShake()
     if autoShakeConnection or not autoShakeEnabled then return end
-    autoShakeConnection = RunService.RenderStepped:Connect(autoShake)
+    autoShakeConnection = RunService.Heartbeat:Connect(autoShake) -- Menggunakan Heartbeat agar lebih cepat
 end
 
 local function stopAutoShake()
@@ -254,7 +322,6 @@ end)
 if autoShakeEnabled and PlayerGui:FindFirstChild("shakeui") and PlayerGui.shakeui:FindFirstChild("safezone") and PlayerGui.shakeui.safezone:FindFirstChild("button") then
     startAutoShake()
 end
-
 -- // // // Auto Reel // // // --
 local autoReelEnabled = false
 local PerfectCatchEnabled = false
@@ -287,15 +354,26 @@ local function startAutoReel()
         noperfect()
         task.wait(2)
         autoReelConnection = RunService.RenderStepped:Connect(autoReel)
+    
     elseif ReelMode == "Blatant" then
         local reel = PlayerGui:FindFirstChild("reel")
         if not reel then return end
         local bar = reel:FindFirstChild("bar")
         local playerbar = bar and bar:FindFirstChild("playerbar")
-        playerbar:GetPropertyChangedSignal('Position'):Wait()
-        game.ReplicatedStorage:WaitForChild("events"):WaitForChild("reelfinished"):FireServer(100, false)
+
+        if playerbar then
+            playerbar:GetPropertyChangedSignal('Position'):Wait()
+
+            -- 🔹 Panggilan pertama (Normal)
+            game.ReplicatedStorage:WaitForChild("events"):WaitForChild("reelfinished"):FireServer(100, false)
+
+            -- 🔹 Panggilan kedua (Mengelabui anti-cheat)
+            task.wait(math.random(0.05, 0.2)) -- Delay acak agar lebih natural
+            game.ReplicatedStorage:WaitForChild("events"):WaitForChild("reelfinished"):FireServer(100, true)
+        end
     end
 end
+
 
 local function stopAutoReel()
     if autoReelConnection then
@@ -462,53 +540,53 @@ end
 -- end)
 
 -- // // // Dupe // // // --
-local DupeEnabled = false
-local DupeConnection
-local function autoDupe()
-    local hud = LocalPlayer.PlayerGui:FindFirstChild("hud")
-    if hud then
-        local safezone = hud:FindFirstChild("safezone")
-        if safezone then
-            local bodyAnnouncements = safezone:FindFirstChild("bodyannouncements")
-            if bodyAnnouncements then
-                local offerFrame = bodyAnnouncements:FindFirstChild("offer")
-                if offerFrame and offerFrame:FindFirstChild("confirm") then
-                    firesignal(offerFrame.confirm.MouseButton1Click)
-                end
-            end
-        end
-    end
-end
+-- local DupeEnabled = false
+-- local DupeConnection
+-- local function autoDupe()
+--     local hud = LocalPlayer.PlayerGui:FindFirstChild("hud")
+--     if hud then
+--         local safezone = hud:FindFirstChild("safezone")
+--         if safezone then
+--             local bodyAnnouncements = safezone:FindFirstChild("bodyannouncements")
+--             if bodyAnnouncements then
+--                 local offerFrame = bodyAnnouncements:FindFirstChild("offer")
+--                 if offerFrame and offerFrame:FindFirstChild("confirm") then
+--                     firesignal(offerFrame.confirm.MouseButton1Click)
+--                 end
+--             end
+--         end
+--     end
+-- end
 
-local function startAutoDupe()
-    if DupeConnection or not DupeEnabled then return end
-    DupeConnection = RunService.RenderStepped:Connect(autoDupe)
-end
+-- local function startAutoDupe()
+--     if DupeConnection or not DupeEnabled then return end
+--     DupeConnection = RunService.RenderStepped:Connect(autoDupe)
+-- end
 
-local function stopAutoDupe()
-    if DupeConnection then
-        DupeConnection:Disconnect()
-        DupeConnection = nil
-    end
-end
+-- local function stopAutoDupe()
+--     if DupeConnection then
+--         DupeConnection:Disconnect()
+--         DupeConnection = nil
+--     end
+-- end
 
-PlayerGui.DescendantAdded:Connect(function(descendant)
-    if DupeEnabled and descendant.Name == "confirm" and descendant.Parent and descendant.Parent.Name == "offer" then
-        local hud = LocalPlayer.PlayerGui:FindFirstChild("hud")
-        if hud then
-            local safezone = hud:FindFirstChild("safezone")
-            if safezone then
-                local bodyAnnouncements = safezone:FindFirstChild("bodyannouncements")
-                if bodyAnnouncements then
-                    local offerFrame = bodyAnnouncements:FindFirstChild("offer")
-                    if offerFrame and offerFrame:FindFirstChild("confirm") then
-                        firesignal(offerFrame.confirm.MouseButton1Click)
-                    end
-                end
-            end
-        end
-    end
-end)
+-- PlayerGui.DescendantAdded:Connect(function(descendant)
+--     if DupeEnabled and descendant.Name == "confirm" and descendant.Parent and descendant.Parent.Name == "offer" then
+--         local hud = LocalPlayer.PlayerGui:FindFirstChild("hud")
+--         if hud then
+--             local safezone = hud:FindFirstChild("safezone")
+--             if safezone then
+--                 local bodyAnnouncements = safezone:FindFirstChild("bodyannouncements")
+--                 if bodyAnnouncements then
+--                     local offerFrame = bodyAnnouncements:FindFirstChild("offer")
+--                     if offerFrame and offerFrame:FindFirstChild("confirm") then
+--                         firesignal(offerFrame.confirm.MouseButton1Click)
+--                     end
+--                 end
+--             end
+--         end
+--     end
+-- end)
 
 -- // // // Exclusives // // // --
 -- local shadowCountLabel = Instance.new("TextLabel", screenGui)
@@ -539,26 +617,55 @@ end)
 -- // // // Tabs Gui // // // --
 
 local Tabs = { -- https://lucide.dev/icons/
-    Home = Window:AddTab({ Title = "Home", Icon = "home" }),
-    Exclusives = Window:AddTab({ Title = "Exclusives", Icon = "heart" }),
-    Main = Window:AddTab({ Title = "Main", Icon = "list" }),
-    Items = Window:AddTab({ Title = "Items", Icon = "box" }),
-    Teleports = Window:AddTab({ Title = "Teleports", Icon = "map-pin" }),
-    Misc = Window:AddTab({ Title = "Misc", Icon = "file-text" }),
-    Trade = Window:AddTab({ Title = "Trade", Icon = "gift" })
+    Information = Window:AddTab({ Title = "Information", Icon = "book" }), -- Informasi umum
+    Main = Window:AddTab({ Title = "Fishing", Icon = "anchor" }), -- Aktivitas memancing
+    -- QuestRod = Window:AddTab({ Title = "Quest Rod", Icon = "target" }), -- Misi dan pencarian rod
+    Shop = Window:AddTab({ Title = "Shop", Icon = "shopping-cart" }), -- Pembelian item
+    Items = Window:AddTab({ Title = "Selling & Repair", Icon = "hammer" }), -- Jual dan perbaikan item
+    Automatically = Window:AddTab({ Title = "Automatically", Icon = "repeat" }), -- Proses otomatis
+    Teleports = Window:AddTab({ Title = "Teleports", Icon = "compass" }), -- Fitur teleportasi
+    CharacterTab = Window:AddTab({ Title = "Character", Icon = "user" }), -- Karakter pemain
+    Exclusives = Window:AddTab({ Title = "Exclusives", Icon = "star" }), -- Item atau fitur spesial
+    Misc = Window:AddTab({ Title = "Misc", Icon = "package" }), -- Fitur tambahan lainnya
+    Settings = Window:AddTab({ Title = "Settings", Icon = "settings" }), -- Pengaturan sistem
 }
-
 local Options = Fluent.Options
 
 do
-    Tabs.Home:AddButton({
+    Tabs.Information:AddButton({
         Title = "Copy Discord link",
-        Description = "Join our main discord!",
+        Description = "Join our main Discord for the latest updates!",
         Callback = function()
             setclipboard("https://discord.gg/NxWyyfVbwp")
         end
     })
-
+    Tabs.Information:AddParagraph({
+        Title = "🚀 CHANGELOGS - Ancestral 1.0",
+        Content = [[
+        🔥 Latest Updates & Enhancements 🔥  
+    
+        🛠 Bug Fixes:  
+        - Patched critical stability issues for a smoother experience.  
+        - Resolved UI glitches for better responsiveness.  
+    
+        ✨ New Features:  
+        - Improved Identity Protection 
+        - More customizable options to hide player data.  
+    
+        ⚡ Performance & Optimizations:  
+        - Faster script execution and reduced lag.  
+        - Optimized UI interactions for better flow.  
+    
+        💡 Community-Driven Changes:  
+        - Added popular features based on user feedback.
+    
+        🔮 What's Next?  
+        - More customization options for the shop system.  
+        - Advanced security features for a safer experience.  
+    
+        🚀 Stay tuned for future updates & exclusive features!
+        ]]
+    })
     -- // Exclusives Tab // --
     local sectionExclus = Tabs.Exclusives:AddSection("Exclusives Features (SOON)")
     -- local CountShadows = Tabs.Exclusives:AddToggle("CountShadows", {Title = "Show Count Shadows", Default = false })
@@ -627,88 +734,199 @@ do
 
     -- // Main Tab // --
     local section = Tabs.Main:AddSection("Auto Fishing")
-    local autoCast = Tabs.Main:AddToggle("autoCast", {Title = "Auto Cast", Default = false })
-    autoCast:OnChanged(function()
-        local RodName = ReplicatedStorage.playerstats[LocalPlayer.Name].Stats.rod.Value
-        if Options.autoCast.Value == true then
-            autoCastEnabled = true
-            if LocalPlayer.Backpack:FindFirstChild(RodName) then
-                LocalPlayer.Character.Humanoid:EquipTool(LocalPlayer.Backpack:FindFirstChild(RodName))
-            end
-            if LocalCharacter then
-                local tool = LocalCharacter:FindFirstChildOfClass("Tool")
-                if tool then
-                    local hasBobber = tool:FindFirstChild("bobber")
-                    if not hasBobber then
-                        if CastMode == "Legit" then
-                            VirtualInputManager:SendMouseButtonEvent(0, 0, 0, true, LocalPlayer, 0)
-                            HumanoidRootPart.ChildAdded:Connect(function()
-                                if HumanoidRootPart:FindFirstChild("power") ~= nil and HumanoidRootPart.power.powerbar.bar ~= nil then
-                                    HumanoidRootPart.power.powerbar.bar.Changed:Connect(function(property)
-                                        if property == "Size" then
-                                            if HumanoidRootPart.power.powerbar.bar.Size == UDim2.new(1, 0, 1, 0) then
-                                                VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, LocalPlayer, 0)
-                                            end
-                                        end
-                                    end)
-                                end
-                            end)
-                        elseif CastMode == "Blatant" then
-                            local rod = LocalCharacter and LocalCharacter:FindFirstChildOfClass("Tool")
-                            if rod and rod:FindFirstChild("values") and string.find(rod.Name, "Rod") then
-                                task.wait(0.5)
-                                local Random = math.random(90, 99)
-                                rod.events.cast:FireServer(Random)
+
+    -- Table untuk menyimpan zona memancing
+    local fishZones = {}
+    
+    -- UI Dropdown untuk memilih zona memancing
+    local fishZoneDropdown = Tabs.Main:AddDropdown("FishZoneDropdown", {
+        Title = "Select Fishing Zone",
+        Values = {},
+        Multi = false,
+        Default = nil,
+    })
+    
+    -- Input Box untuk Nama Zona
+    local zoneNameInput = Tabs.Main:AddInput("ZoneNameInput", {
+        Title = "Zone Name",
+        Default = "Fishing Spot",
+        Placeholder = "Enter zone name...",
+    })
+    
+    -- Button untuk membuat zona baru
+    Tabs.Main:AddButton({
+        Title = "Create Fish Zone",
+        Description = "Save current location as a Fishing Zone (Will Be Deleted If Rejoin Game)",
+        Callback = function()
+            local playerPos = LocalPlayer.Character.HumanoidRootPart.CFrame
+            local zoneName = zoneNameInput.Value ~= "" and zoneNameInput.Value or "Zone " .. tostring(#fishZones + 1)
+    
+            -- Simpan zona baru ke table
+            fishZones[zoneName] = playerPos
+    
+            -- Update Dropdown UI
+            table.insert(fishZoneDropdown.Values, zoneName)
+            fishZoneDropdown:SetValues(fishZoneDropdown.Values)
+    
+            -- Notify user
+            Fluent:Notify({
+                Title = "Fishing Zone",
+                Content = "Created new zone: " .. zoneName,
+                Duration = 5
+            })
+        end
+    })
+    
+    -- Saat memilih zona, teleport ke lokasi tersebut
+    fishZoneDropdown:OnChanged(function(selectedZone)
+        if fishZones[selectedZone] and LocalPlayer.Character then
+            local targetPos = fishZones[selectedZone] * CFrame.new(0, 3, 0) -- Sedikit di atas agar tetap stabil
+            LocalPlayer.Character.HumanoidRootPart.CFrame = targetPos
+        end
+    end)
+    
+    -- AUTO CAST
+    local autoCast = Tabs.Main:AddToggle("autoCast", { Title = "Auto Cast", Default = false })
+
+    local function StartAutoFishing()
+        spawn(function()
+            while autoCastEnabled do
+                pcall(function()
+                    local character = LocalPlayer.Character
+                    if character then
+                        local rodName = ReplicatedStorage.playerstats[LocalPlayer.Name].Stats.rod.Value
+                        local rod = character:FindFirstChildOfClass("Tool") or LocalPlayer.Backpack:FindFirstChild(rodName)
+    
+                        if rod and rod.Parent == LocalPlayer.Backpack then
+                            character.Humanoid:EquipTool(rod)
+                        end
+    
+                        if rod then
+                            local values = rod:FindFirstChild("values")
+                            local events = rod:FindFirstChild("events")
+    
+                            if values and events and not values.casted.Value then
+                                events.cast:FireServer(100, 1)
                             end
                         end
                     end
-                end
-                task.wait(1)
+                end)
+                task.wait() -- Minimal delay untuk mencegah lag
             end
-        else
-            autoCastEnabled = false
+        end)
+    end
+    autoCast:OnChanged(function()
+        autoCastEnabled = Options.autoCast.Value
+        if autoCastEnabled then
+            StartAutoFishing()
         end
     end)
-    local autoShake = Tabs.Main:AddToggle("autoShake", {Title = "Auto Shake", Default = false })
+        
+    -- Auto Shake
+    local autoShake = Tabs.Main:AddToggle("autoShake", { Title = "Auto Shake", Default = false })
+
     autoShake:OnChanged(function()
-        if Options.autoShake.Value == true then
-            autoShakeEnabled = true
-            startAutoShake()
-        else
-            autoShakeEnabled = false
-            stopAutoShake()
-        end
-    end)
-    local autoReel = Tabs.Main:AddToggle("autoReel", {Title = "Auto Reel", Default = false })
-    autoReel:OnChanged(function()
-        if Options.autoReel.Value == true then
-            autoReelEnabled = true
-            startAutoReel()
-        else
-            autoReelEnabled = false
-            stopAutoReel()
-        end
-    end)
-    local FreezeCharacter = Tabs.Main:AddToggle("FreezeCharacter", {Title = "Freeze Character", Default = false })
-    FreezeCharacter:OnChanged(function()
+        pcall(function()
+            if Options.autoShake.Value then
+                autoShakeEnabled = true
+                task.defer(function()
+                    while autoShakeEnabled do
+                        local rod = LocalCharacter and LocalCharacter:FindFirstChildOfClass("Tool")
+                        if rod and rod:FindFirstChild("bobber") then
+                            rod.events.shake:FireServer()
+                        end
+                        -- Randomize delay to avoid detection
+                        task.wait(math.random(0.3, 0.8))
+                    end
+                end)
+            else
+                autoShakeEnabled = false
+            end
+        end)
+    end)    
+ -- AUTO REEL 
+ local autoReelEnabled = false
+ local instaReelEnabled = false
+ 
+ local function StartAutoReel()
+     spawn(function()
+         while autoReelEnabled do
+             local reelGui = LocalPlayer.PlayerGui:FindFirstChild("reel")
+             if reelGui then
+                 local bar = reelGui:FindFirstChild("bar")
+                 if bar then
+                     local playerBar = bar:FindFirstChild("playerbar")
+                     local fish = bar:FindFirstChild("fish")
+                     while bar and reelGui:IsDescendantOf(LocalPlayer.PlayerGui) do
+                         RunService.RenderStepped:Wait()
+                         local newPosition = playerBar.Position:Lerp(fish.Position, 0.7)
+                         playerBar.Position = UDim2.fromScale(math.clamp(newPosition.X.Scale, 0.15, 0.85), newPosition.Y.Scale)
+                     end
+                 end
+             end
+             wait(math.random(0.1, 0.3))
+         end
+     end)
+ end
+ 
+ local function StartInstaReel()
+     spawn(function()
+         while instaReelEnabled do
+             local reelGui = LocalPlayer.PlayerGui:FindFirstChild("reel")
+             if reelGui then
+                 local bar = reelGui:FindFirstChild("bar")
+                 if bar then
+                     local reel = bar:FindFirstChild("reel")
+                     if reel and reel.Enabled == true then
+                         local reelFinished = ReplicatedStorage.events:WaitForChild("reelfinished")
+                         reelFinished:FireServer(math.random(95, 105), math.random(1, 10) > 2)
+                         task.wait(math.random(0.1, 0.5))
+                         reelFinished:FireServer(100, false)
+                     end
+                 end
+             end
+             wait(math.random(0.1, 0.3))
+         end
+     end)
+ end
+ 
+ local autoReelToggle = Tabs.Main:AddToggle("autoReel", { Title = "Auto Reel Legit", Default = false })
+ autoReelToggle:OnChanged(function()
+     autoReelEnabled = Options.autoReel.Value
+     if autoReelEnabled then
+         task.spawn(StartAutoReel)
+     end
+ end)
+ 
+ local instaReelToggle = Tabs.Main:AddToggle("instaReel", { Title = "Instant Reel", Default = false })
+ instaReelToggle:OnChanged(function()
+     instaReelEnabled = Options.instaReel.Value
+     if instaReelEnabled then
+         task.spawn(StartInstaReel)
+     end
+ end) 
+
+-- FREEZE CHARACTER
+local FreezeCharacter = Tabs.Main:AddToggle("FreezeCharacter", { Title = "Freeze Character", Default = false })
+FreezeCharacter:OnChanged(function()
+    pcall(function()
         local oldpos = HumanoidRootPart.CFrame
         FreezeChar = Options.FreezeCharacter.Value
-        task.wait()
-        while WaitForSomeone(RenderStepped) do
-            if FreezeChar and HumanoidRootPart ~= nil then
-                task.wait()
+        while FreezeChar and task.wait(math.random(0.1, 0.5)) do
+            if HumanoidRootPart then
                 HumanoidRootPart.CFrame = oldpos
             else
                 break
             end
         end
     end)
+end)
 
     -- // Mode Tab // --
     local section = Tabs.Main:AddSection("Mode Fishing")
     local autoCastMode = Tabs.Main:AddDropdown("autoCastMode", {
         Title = "Auto Cast Mode",
-        Values = {"Legit", "Blatant"},
+        Values = {"Legit"},
         Multi = false,
         Default = CastMode,
     })
@@ -717,40 +935,188 @@ do
     end)
     local autoShakeMode = Tabs.Main:AddDropdown("autoShakeMode", {
         Title = "Auto Shake Mode",
-        Values = {"Navigation", "Mouse"},
+        Values = {"Navigation"},
         Multi = false,
         Default = ShakeMode,
     })
     autoShakeMode:OnChanged(function(Value)
         ShakeMode = Value
     end)
-    local autoReelMode = Tabs.Main:AddDropdown("autoReelMode", {
-        Title = "Auto Reel Mode",
-        Values = {"Legit", "Blatant"},
+    -- local autoReelMode = Tabs.Main:AddDropdown("autoReelMode", {
+    --     Title = "Auto Reel Mode",
+    --     Values = {"Legit", "Blatant"},
+    --     Multi = false,
+    --     Default = ReelMode,
+    -- })
+    -- autoReelMode:OnChanged(function(Value)
+    --     ReelMode = Value
+    -- end)
+    
+    -- Quest Rod
+-- local section = Tabs.QuestRod:AddSection("Quest Heavens Rod (DISABLE)")
+-- -- Dropdown untuk Crystal Location
+-- local HeavenRodTPDropdown = Tabs.QuestRod:AddDropdown("HeavenRodTPDropdown", {
+--     Title = "Select Crystal & Rod Location",
+--     Values = {"Heaven Rod", "Blue Crystal", "Green Crystal", "Yellow Crystal", "Red Crystal"},
+--     Multi = false,
+--     Default = nil,
+-- })
+
+-- HeavenRodTPDropdown:OnChanged(function(Value)
+--     task.defer(function() -- Menghindari callback overflow
+--         if Value == "Heaven Rod" then
+--             HumanoidRootPart.CFrame = CFrame.new(20024.000000, -467.665955, 7115.000000)
+--         elseif Value == "Blue Crystal" then
+--             HumanoidRootPart.CFrame = CFrame.new(20129.000000, 208.370102, 5441.000000)
+--         elseif Value == "Green Crystal" then
+--             HumanoidRootPart.CFrame = CFrame.new(19876.000000, 448.094055, 5558.000000)
+--         elseif Value == "Yellow Crystal" then
+--             HumanoidRootPart.CFrame = CFrame.new(19499.000000, 335.168915, 5549.000000)
+--         elseif Value == "Red Crystal" then
+--             HumanoidRootPart.CFrame = CFrame.new(19926.000000, 1137.889404, 5353.000000)
+--         end
+--         HeavenRodTPDropdown:SetValue(nil)
+--     end)
+-- end)
+
+-- -- Dropdown untuk Button Location
+-- local ButtonTPDropdown = Tabs.QuestRod:AddDropdown("ButtonTPDropdown", {
+--     Title = "Select Button Location",
+--     Values = {"Button 1", "Button 2", "Button 3", "Button 4", "Button 5"},
+--     Multi = false,
+--     Default = nil,
+-- })
+
+-- ButtonTPDropdown:OnChanged(function(Value)
+--     task.defer(function() -- Menghindari callback overflow
+--         if Value == "Button 1" then
+--             HumanoidRootPart.CFrame = CFrame.new(402.000000, 135.027023, 266.000000)
+--         elseif Value == "Button 2" then
+--             HumanoidRootPart.CFrame = CFrame.new(-1718.000000, 148.000015, 733.000000)
+--         elseif Value == "Button 3" then
+--             HumanoidRootPart.CFrame = CFrame.new(-2564.000000, 181.150101, 1349.000000)
+--         elseif Value == "Button 4" then
+--             HumanoidRootPart.CFrame = CFrame.new(2930.000000, 281.783630, 2590.000000)
+--         elseif Value == "Button 5" then
+--             HumanoidRootPart.CFrame = CFrame.new(5505.701172, 143.496613, -317.915436)
+--         end
+--         ButtonTPDropdown:SetValue(nil)
+--     end)
+-- end)
+
+    -- Shop Tab
+    local section = Tabs.Shop:AddSection("Shop Feature")
+    -- Dropdown untuk Rods
+    local RodDropdown = Tabs.Shop:AddDropdown("RodDropdown", {
+        Title = "Rods",
+        Values = {
+            "Carbon Rod", "Fast Rod", "Flimsy Rod", "Long Rod", "Lucky Rod", "Plastic Rod", "Training Rod", "Tempest Rod", 
+            "Kings Rod", "Scurvy Rod", "Nocturnal Rod", "Magnet Rod", "Trident Rod", "Lost Rod", "Reinforced Rod", "Steady Rod"
+        },
         Multi = false,
-        Default = ReelMode,
+        Default = nil,
     })
-    autoReelMode:OnChanged(function(Value)
-        ReelMode = Value
+    
+    -- Dropdown untuk Bait
+    local BaitDropdown = Tabs.Shop:AddDropdown("BaitDropdown", {
+        Title = "Bait",
+        Values = { "BaitCrate", "CoralGeode" },
+        Multi = false,
+        Default = nil,
+    })
+    
+    -- Dropdown untuk Item Biasa
+    local ItemDropdown = Tabs.Shop:AddDropdown("ItemDropdown", {
+        Title = "Miscellaneous Items",
+        Values = { "Crab Cage", "GPS", "Enchant Relic", "Merlin", "Fish Radar", "Basic Diving Gear", "Conception Conch", 
+                    "Advance Diving Gear", "Super Flippers", "Flippers", "TideBreaker" },
+        Multi = false,
+        Default = nil,
+    })
+    
+    RodDropdown:OnChanged(function(Value)
+        local rodLocations = {
+            ["Carbon Rod"] = CFrame.new(454.084, 150.590, 225.329),
+            ["Fast Rod"] = CFrame.new(447.184, 148.226, 220.187),
+            ["Flimsy Rod"] = CFrame.new(471.108, 148.362, 229.642),
+            ["Long Rod"] = CFrame.new(485.695, 174.500, 145.746),
+            ["Lucky Rod"] = CFrame.new(446.086, 148.253, 222.160),
+            ["Plastic Rod"] = CFrame.new(454.425, 148.170, 229.172),
+            ["Training Rod"] = CFrame.new(457.694, 148.358, 230.414),
+            ["Tempest Rod"] = CFrame.new(-4931.645, -595.234, 1852.508),
+            ["Kings Rod"] = CFrame.new(1375.900, -807.289, -303.509),
+            ["Scurvy Rod"] = CFrame.new(-2827.079, 214.974, 1512.480),
+            ["Nocturnal Rod"] = CFrame.new(-141.874, -512.374, 1139.045),
+            ["Magnet Rod"] = CFrame.new(-195.603, 132.500, 1930.978),
+            ["Trident Rod"] = CFrame.new(-1482.732, -226.024, -2200.441),
+            ["Lost Rod"] = CFrame.new(2879.567, 137.820, 2722.313),
+            ["Reinforced Rod"] = CFrame.new(-986.474, -242.510, -2689.792),
+            ["Steady Rod"] = CFrame.new(-1510.391, 141.852, 762.347)
+        }
+        
+        if rodLocations[Value] then
+            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = rodLocations[Value]
+        end
+    end)    
+    -- Event untuk BaitDropdown
+    BaitDropdown:OnChanged(function(Value)
+        local baitLocations = {
+            BaitCrate = CFrame.new(384.575, 135.352, 337.534),
+            CoralGeode = CFrame.new(-1644.115, -213.679, -2848.292)
+        }
+        if baitLocations[Value] then
+            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = baitLocations[Value]
+        end
     end)
+    
+    -- Event untuk ItemDropdown
+ItemDropdown:OnChanged(function(Value)
+    local itemLocations = {
+        ["Crab Cage"] = CFrame.new(474.804, 149.665, 229.495),
+        ["GPS"] = CFrame.new(517.897, 149.218, 284.857),
+        ["Enchant Relic"] = CFrame.new(-929.754, 225.730, -993.629),
+        ["Merlin"] = CFrame.new(-929.754, 225.730, -993.629),
+        ["Fish Radar"] = CFrame.new(365.751, 137.000, 274.105),
+        ["Basic Diving Gear"] = CFrame.new(-1653.104, -212.269, -2823.574),
+        ["Conception Conch"] = CFrame.new(-1630.507, -211.645, -2859.729),
+        ["Advance Diving Gear"] = CFrame.new(-790.801, 132.749, -3102.360),
+        ["Super Flippers"] = CFrame.new(-966.494, -242.510, -2694.468),
+        ["Flippers"] = CFrame.new(-1641.443, -213.679, -2852.460),
+        ["TideBreaker"] = CFrame.new(-1642.117, -213.679, -2850.791)
+    }
+    
+    if itemLocations[Value] then
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = itemLocations[Value]
+    end
+end)
 
-    -- // Sell Tab // --
-    local section = Tabs.Items:AddSection("Sell Items")
-    Tabs.Items:AddButton({
-        Title = "Sell Hand",
-        Description = "",
-        Callback = function()
-            SellHand()
-        end
+    Tabs.Shop:AddParagraph({
+        Title = "About Shop Features",
+        Content = [[
+        This section will receive future updates!  
+    
+        🔹 Soon, a Buy Button will be added, allowing you to purchase items directly without teleportation.  
+        ]]
     })
-    Tabs.Items:AddButton({
-        Title = "Sell All",
-        Description = "",
-        Callback = function()
-            SellAll()
-        end
-    })
+    
+   -- // Sell Tab // --
+local section = Tabs.Items:AddSection("Sell Items")
 
+Tabs.Items:AddButton({
+    Title = "Sell Hand",
+    Description = "",
+    Callback = function()
+        SellHand()
+    end
+})
+
+Tabs.Items:AddButton({
+    Title = "Sell All",
+    Description = "",
+    Callback = function()
+        SellAll()
+    end
+})
     -- // Treasure Tab // --
     local section = Tabs.Items:AddSection("Treasure")
     Tabs.Items:AddButton({
@@ -794,21 +1160,56 @@ do
 
     -- // Teleports Tab // --
     local section = Tabs.Teleports:AddSection("Select Teleport")
+
+    -- Pastikan teleportSpots terurut alfabetis
+    table.sort(teleportSpots, function(a, b)
+        return a:lower() < b:lower()
+    end)
+    
     local IslandTPDropdownUI = Tabs.Teleports:AddDropdown("IslandTPDropdownUI", {
         Title = "Area Teleport",
         Values = teleportSpots,
         Multi = false,
         Default = nil,
     })
+    
     IslandTPDropdownUI:OnChanged(function(Value)
         if teleportSpots ~= nil and HumanoidRootPart ~= nil then
             xpcall(function()
-                HumanoidRootPart.CFrame = TpSpotsFolder:FindFirstChild(Value).CFrame + Vector3.new(0, 5, 0)
-                IslandTPDropdownUI:SetValue(nil)
-            end,function (err)
+                local target = TpSpotsFolder:FindFirstChild(Value)
+                if target then
+                    HumanoidRootPart.CFrame = target.CFrame + Vector3.new(0, 5, 0)
+                    IslandTPDropdownUI:SetValue(nil)
+                end
+            end, function(err)
+                warn("Teleport Error: ", err)
             end)
         end
     end)
+    -- local Places = {
+    --     ["Level Puzzle"] = Vector3.new(19955.671875, 586.853760, 5571.535645),
+    --     ["Glacial Grotto"] = Vector3.new(19907.169922, 1154.770264, 5505.628906),
+    --     ["Cryogenic Canal"] = Vector3.new(20303.177734, 706.598999, 5767.073242),
+    --     ["Frigid Cavern"] = Vector3.new(19759.777344, 415.437073, 5402.320312),
+    --     ["OverGrowth Caves"] = Vector3.new(19640.792969, 131.420105, 5249.434082),
+    --     ["Loading"] = Vector3.new(418.162872, -222.970337, 310.930817),
+    --     ["Executive"] = Vector3.new(-31.488470, -246.599991, 200.243546)
+    -- }
+    
+    -- local PlacesTPDropdownUI = Tabs.Teleports:AddDropdown("PlacesTPDropdownUI", {
+    --     Title = "Select Location",
+    --     Values = {"Level Puzzle", "Glacial Grotto", "Cryogenic Canal", "Frigid Cavern", "OverGrowth Caves", "Loading", "Executive"},
+    --     Multi = false,
+    --     Default = nil,
+    -- })
+    
+    -- PlacesTPDropdownUI:OnChanged(function(Value)
+    --     local character = game.Players.LocalPlayer.Character
+    --     if character and Places[Value] then
+    --         character.HumanoidRootPart.CFrame = CFrame.new(Places[Value])
+    --     end
+    --     PlacesTPDropdownUI:SetValue(nil)
+    -- end)
     local TotemTPDropdownUI = Tabs.Teleports:AddDropdown("TotemTPDropdownUI", {
         Title = "Select Totem",
         Values = {"Aurora", "Sundial", "Windset", "Smokescreen", "Tempest"},
@@ -899,57 +1300,108 @@ do
     })
 
     -- // Character Tab // --
-    local section = Tabs.Misc:AddSection("Character")
-    local WalkOnWater = Tabs.Misc:AddToggle("WalkOnWater", {Title = "Walk On Water", Default = false })
-    WalkOnWater:OnChanged(function()
-        for i,v in pairs(workspace.zones.fishing:GetChildren()) do
-			if v.Name == WalkZone then
-				v.CanCollide = Options.WalkOnWater.Value
-                if v.Name == "Ocean" then
-                    for i,v in pairs(workspace.zones.fishing:GetChildren()) do
-                        if v.Name == "Deep Ocean" then
-                            v.CanCollide = Options.WalkOnWater.Value
-                        end
+    local IdentityHiderUI = Tabs.CharacterTab:AddToggle("IdentityHiderUI", {Title = "Protect Identity", Default = false})
+    IdentityHiderUI:OnChanged(function()
+        while Options.IdentityHiderUI.Value == true do
+            -- Update elemen UI dengan warna yang lebih elegan dan tidak mencolok
+            if UserPlayer:FindFirstChild("streak") then
+                UserPlayer.streak.Text = "Ancestral"
+                UserPlayer.streak.TextColor3 = Color3.fromRGB(180, 180, 180) -- Abu-abu medium, lebih soft
+            end
+            if UserPlayer:FindFirstChild("level") then
+                UserPlayer.level.Text = "Ancestral"
+                UserPlayer.level.TextColor3 = Color3.fromRGB(140, 140, 220) -- Biru pastel yang lebih kalem
+            end
+            if UserPlayer:FindFirstChild("user") then
+                UserPlayer.user.Text = "Ancestral Protect"
+                UserPlayer.user.TextColor3 = Color3.fromRGB(160, 160, 160) -- Abu-abu yang lebih seimbang
+            end
+            local hud = LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("hud"):WaitForChild("safezone")
+            if hud:FindFirstChild("coins") then
+                hud.coins.Text = "HIDDEN"
+                hud.coins.TextColor3 = Color3.fromRGB(235, 210, 150) -- Kuning emas lembut, lebih elegan
+            end
+            if hud:FindFirstChild("lvl") then
+                hud.lvl.Text = "Ancestral MAX"
+                hud.lvl.TextColor3 = Color3.fromRGB(190, 170, 230) -- Ungu pastel lembut
+            end
+            task.wait(0.01)
+        end
+    end)    
+local WalkOnWater = Tabs.CharacterTab:AddToggle("WalkOnWater", {Title = "Walk On Water", Default = false })
+WalkOnWater:OnChanged(function()
+    for _, v in pairs(workspace.zones.fishing:GetChildren()) do
+        if v.Name == WalkZone then
+            v.CanCollide = Options.WalkOnWater.Value
+            if v.Name == "Ocean" then
+                for _, v in pairs(workspace.zones.fishing:GetChildren()) do
+                    if v.Name == "Deep Ocean" then
+                        v.CanCollide = Options.WalkOnWater.Value
                     end
                 end
-			end
-		end
-    end)
-    local WalkOnWaterZone = Tabs.Misc:AddDropdown("WalkOnWaterZone", {
-        Title = "Walk On Water Zone",
-        Values = {"Ocean", "Desolate Deep", "The Depths"},
-        Multi = false,
-        Default = "Ocean",
-    })
-    WalkOnWaterZone:OnChanged(function(Value)
-        WalkZone = Value
-    end)
-    local WalkSpeedSliderUI = Tabs.Misc:AddSlider("WalkSpeedSliderUI", {
-        Title = "Walk Speed",
-        Min = 16,
-        Max = 200,
-        Default = 16,
-        Rounding = 1,
-    })
-    WalkSpeedSliderUI:OnChanged(function(value)
-        LocalPlayer.Character.Humanoid.WalkSpeed = value
-    end)
-    local JumpHeightSliderUI = Tabs.Misc:AddSlider("JumpHeightSliderUI", {
-        Title = "Jump Height",
-        Min = 50,
-        Max = 200,
-        Default = 50,
-        Rounding = 1,
-    })
-    JumpHeightSliderUI:OnChanged(function(value)
-        LocalPlayer.Character.Humanoid.JumpPower = value
-    end)
+            end
+        end
+    end
+end)
 
-    -- local ToggleNoclip = Tabs.Misc:AddToggle("ToggleNoclip", {Title = "Noclip", Default = false })
-    -- ToggleNoclip:OnChanged(function()
-    --     Noclip = Options.ToggleNoclip.Value
-    -- end)
+local WalkOnWaterZone = Tabs.CharacterTab:AddDropdown("WalkOnWaterZone", {
+    Title = "Walk On Water Zone",
+    Values = {"Ocean", "Desolate Deep", "The Depths"},
+    Multi = false,
+    Default = "Ocean",
+})
+WalkOnWaterZone:OnChanged(function(Value)
+    WalkZone = Value
+end)
 
+local WalkSpeedSliderUI = Tabs.CharacterTab:AddSlider("WalkSpeedSliderUI", {
+    Title = "Walk Speed",
+    Min = 16,
+    Max = 200,
+    Default = 16,
+    Rounding = 1,
+})
+WalkSpeedSliderUI:OnChanged(function(value)
+    LocalPlayer.Character.Humanoid.WalkSpeed = value
+end)
+
+local JumpHeightSliderUI = Tabs.CharacterTab:AddSlider("JumpHeightSliderUI", {
+    Title = "Jump Height",
+    Min = 50,
+    Max = 200,
+    Default = 50,
+    Rounding = 1,
+})
+JumpHeightSliderUI:OnChanged(function(value)
+    LocalPlayer.Character.Humanoid.JumpPower = value
+end)
+
+-- // Useful Features Section // --
+local usefulSection = Tabs.CharacterTab:AddSection("Useful Features")
+
+local AntiAFK = usefulSection:AddToggle("AntiAFK", {Title = "Anti-AFK", Default = true})
+AntiAFK:OnChanged(function(m)
+    if m then
+        local virtualUser = game:GetService("VirtualUser")
+        LocalPlayer.Idled:Connect(function()
+            virtualUser:CaptureController()
+            virtualUser:ClickButton2(Vector2.new())
+        end)
+    end
+end)
+
+local InfiniteOxygen = usefulSection:AddToggle("InfiniteOxygen", {Title = "Infinite Oxygen", Default = false})
+InfiniteOxygen:OnChanged(function(m)
+    if m then
+        local divingTank = Instance.new("Glue")
+        divingTank.Name = "DivingTank"
+        divingTank:SetAttribute("Tier", 9e9)
+        divingTank.Parent = LocalPlayer.Character
+    else
+        local existingTank = LocalPlayer.Character:FindFirstChild("DivingTank")
+        if existingTank then existingTank:Destroy() end
+    end
+end)
     -- // Misc Tab // --
     local section = Tabs.Misc:AddSection("Misc")
     local BypassRadar = Tabs.Misc:AddToggle("BypassRadar", {Title = "Bypass Fish Radar", Default = false })
@@ -960,29 +1412,29 @@ do
 			end
 		end
     end)
-    local BypassGPS = Tabs.Misc:AddToggle("BypassGPS", {Title = "Bypass GPS", Default = false })
-    BypassGPS:OnChanged(function()
-        if Options.BypassGPS.Value == true then
-            local XyzClone = game:GetService("ReplicatedStorage").resources.items.items.GPS.GPS.gpsMain.xyz:Clone()
-			XyzClone.Parent = game.Players.LocalPlayer.PlayerGui:WaitForChild("hud"):WaitForChild("safezone"):WaitForChild("backpack")
-			local Pos = GetPosition()
-			local StringInput = string.format("%s, %s, %s", ExportValue(Pos[1]), ExportValue(Pos[2]), ExportValue(Pos[3]))
-			XyzClone.Text = "<font color='#ff4949'>X</font><font color = '#a3ff81'>Y</font><font color = '#626aff'>Z</font>: "..StringInput
-			BypassGpsLoop = game:GetService("RunService").Heartbeat:Connect(function()
-				local Pos = GetPosition()
-				StringInput = string.format("%s, %s, %s", ExportValue(Pos[1]), ExportValue(Pos[2]), ExportValue(Pos[3]))
-				XyzClone.Text = "<font color='#ff4949'>X</font><font color = '#a3ff81'>Y</font><font color = '#626aff'>Z</font> : "..StringInput
-			end)
-		else
-			if PlayerGui.hud.safezone.backpack:FindFirstChild("xyz") then
-				PlayerGui.hud.safezone.backpack:FindFirstChild("xyz"):Destroy()
-			end
-			if BypassGpsLoop then
-				BypassGpsLoop:Disconnect()
-				BypassGpsLoop = nil
-			end
-        end
-    end)
+    -- local BypassGPS = Tabs.Misc:AddToggle("BypassGPS", {Title = "Bypass GPS", Default = false })
+    -- BypassGPS:OnChanged(function()
+    --     if Options.BypassGPS.Value == true then
+    --         local XyzClone = game:GetService("ReplicatedStorage").resources.items.items.GPS.GPS.gpsMain.xyz:Clone()
+	-- 		XyzClone.Parent = game.Players.LocalPlayer.PlayerGui:WaitForChild("hud"):WaitForChild("safezone"):WaitForChild("backpack")
+	-- 		local Pos = GetPosition()
+	-- 		local StringInput = string.format("%s, %s, %s", ExportValue(Pos[1]), ExportValue(Pos[2]), ExportValue(Pos[3]))
+	-- 		XyzClone.Text = "<font color='#ff4949'>X</font><font color = '#a3ff81'>Y</font><font color = '#626aff'>Z</font>: "..StringInput
+	-- 		BypassGpsLoop = game:GetService("RunService").Heartbeat:Connect(function()
+	-- 			local Pos = GetPosition()
+	-- 			StringInput = string.format("%s, %s, %s", ExportValue(Pos[1]), ExportValue(Pos[2]), ExportValue(Pos[3]))
+	-- 			XyzClone.Text = "<font color='#ff4949'>X</font><font color = '#a3ff81'>Y</font><font color = '#626aff'>Z</font> : "..StringInput
+	-- 		end)
+	-- 	else
+	-- 		if PlayerGui.hud.safezone.backpack:FindFirstChild("xyz") then
+	-- 			PlayerGui.hud.safezone.backpack:FindFirstChild("xyz"):Destroy()
+	-- 		end
+	-- 		if BypassGpsLoop then
+	-- 			BypassGpsLoop:Disconnect()
+	-- 			BypassGpsLoop = nil
+	-- 		end
+    --     end
+    -- end)
     local RemoveFog = Tabs.Misc:AddToggle("RemoveFog", {Title = "Remove Fog", Default = false })
     RemoveFog:OnChanged(function()
         if Options.RemoveFog.Value == true then
@@ -1008,29 +1460,20 @@ do
 			end
         end
     end)
-    local HoldDuration = Tabs.Misc:AddToggle("HoldDuration", {Title = "Hold Duration 0 sec", Default = false })
-    HoldDuration:OnChanged(function()
-        if Options.HoldDuration.Value == true then
-            for i,v in ipairs(game:GetService("Workspace"):GetDescendants()) do
-                if v.ClassName == "ProximityPrompt" then
-                    v.HoldDuration = 0
-                end
-            end
-        end
-    end)
-    local DisableOxygen = Tabs.Misc:AddToggle("DisableOxygen", {Title = "Disable Oxygen", Default = true })
-    DisableOxygen:OnChanged(function()
-        LocalPlayer.Character.client.oxygen.Disabled = Options.DisableOxygen.Value
-    end)
-    Tabs.Misc:AddButton({
-        Title = "Copy XYZ",
-        Description = "Copy Clipboard",
-        Callback = function()
-            local XYZ = tostring(game.Players.LocalPlayer.Character.HumanoidRootPart.Position)
-            setclipboard("game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(" .. XYZ .. ")")
-        end
-    })
-
+    -- local HoldDuration = Tabs.Misc:AddToggle("HoldDuration", {Title = "Hold Duration 0 sec", Default = false })
+    -- HoldDuration:OnChanged(function()
+    --     if Options.HoldDuration.Value == true then
+    --         for i,v in ipairs(game:GetService("Workspace"):GetDescendants()) do
+    --             if v.ClassName == "ProximityPrompt" then
+    --                 v.HoldDuration = 0
+    --             end
+    --         end
+    --     end
+    -- end)
+    -- local DisableOxygen = Tabs.Misc:AddToggle("DisableOxygen", {Title = "Disable Oxygen", Default = true })
+    -- DisableOxygen:OnChanged(function()
+    --     LocalPlayer.Character.client.oxygen.Disabled = Options.DisableOxygen.Value
+    -- end)
     local JustUI = Tabs.Misc:AddToggle("JustUI", {Title = "Show/Hide UIs", Default = true })
     JustUI:OnChanged(function()
         local BlackShow = JustUI.Value
@@ -1040,20 +1483,86 @@ do
             PlayerGui.hud.safezone.Visible = false
         end
     end)
-
-    local IdentityHiderUI = Tabs.Misc:AddToggle("IdentityHiderUI", {Title = "Protect Identity", Default = false })    
-    IdentityHiderUI:OnChanged(function()
-        while Options.IdentityHiderUI.Value == true do
-            if UserPlayer:FindFirstChild("streak") then UserPlayer.streak.Text = "HIDDEN" end
-            if UserPlayer:FindFirstChild("level") then UserPlayer.level.Text = "Level: HIDDEN" end
-            if UserPlayer:FindFirstChild("level") then UserPlayer.user.Text = "HIDDEN" end
-            local hud = LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("hud"):WaitForChild("safezone")
-            if hud:FindFirstChild("coins") then hud.coins.Text = "HIDDEN$" end
-            if hud:FindFirstChild("lvl") then hud.lvl.Text = "HIDDEN LVL" end
-            task.wait(0.01)
+    -- // // // Optimized FPS Boost // // // --
+local function optimizeFPS()
+    local workspace = game.Workspace
+    local lighting = game.Lighting
+    local terrain = workspace.Terrain
+    
+    -- Optimize terrain water properties
+    terrain.WaterWaveSize = 0
+    terrain.WaterWaveSpeed = 0
+    terrain.WaterReflectance = 0
+    terrain.WaterTransparency = 1
+    
+    -- Optimize lighting settings
+    lighting.GlobalShadows = false
+    lighting.FogEnd = 8999999488
+    lighting.Brightness = 0
+    settings().Rendering.QualityLevel = "Level01"
+    
+    -- Optimize game elements
+    for _, obj in pairs(game:GetDescendants()) do
+        if obj:IsA("BasePart") or obj:IsA("MeshPart") then
+            obj.Material = "SmoothPlastic"
+            obj.Reflectance = 0
+            obj.CastShadow = false
+        elseif obj:IsA("Decal") then
+            obj.Transparency = 1
+        elseif obj:IsA("ParticleEmitter") or obj:IsA("Trail") then
+            obj.Lifetime = NumberRange.new(0)
+        elseif obj:IsA("Explosion") then
+            obj.BlastPressure = 1
+            obj.BlastRadius = 1
+        elseif obj:IsA("Fire") or obj:IsA("SpotLight") or obj:IsA("Smoke") then
+            obj.Enabled = false
         end
-    end)
+    end
+    
+    -- Disable post-processing effects
+    for _, effect in pairs(lighting:GetChildren()) do
+        if effect:IsA("PostEffect") or effect:IsA("DepthOfFieldEffect") then
+            effect.Enabled = false
+        end
+    end
+end
 
+-- Add performance button
+Tabs.Misc:AddButton({
+    Title = "1-Click FPS Boost",
+    Description = "Improves FPS by applying optimizations.",
+    Callback = function()
+        optimizeFPS()
+    end
+})
+
+    Tabs.Misc:AddButton({
+        Title = "Copy Coordinat",
+        Description = "Copy to see your Coordinat",
+        Callback = function()
+            local player = game.Players.LocalPlayer
+            if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                local XYZ = player.Character.HumanoidRootPart.Position
+                local coordString = string.format("game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(%f, %f, %f)", XYZ.X, XYZ.Y, XYZ.Z)
+                
+                -- Menyalin koordinat ke clipboard
+                setclipboard(coordString)
+                
+                -- Menampilkan notifikasi
+                Fluent:Notify({
+                    Title = "Ancestral",
+                    Content = "Coordinates copied to clipboard!",
+                    Duration = 8
+                })
+            else
+                Fluent:Notify({
+                    Title = "Error",
+                    Content = "Failed to get coordinates!",
+                    Duration = 5
+                })
+            end
+        end
+    })
     -- // Load Tab // --
     local section = Tabs.Misc:AddSection("Load Scripts")
     Tabs.Misc:AddButton({
@@ -1068,10 +1577,23 @@ do
             loadstring(game:HttpGetAsync("https://github.com/richie0866/remote-spy/releases/latest/download/RemoteSpy.lua"))()
         end
     })
+    Tabs.Misc:AddButton({
+        Title = "Load OldServer-Finder",
+        Callback = function()
+            loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Spectrum-Trash/Addons/refs/heads/main/FindServer.lua"))()
+        end
+    })
 
-    local section = Tabs.Trade:AddSection("Coming Soon...")
+    local section = Tabs.Automatically:AddSection("Sorry I Disable This To Remake")
 end
-
+local section = Tabs.Setting:AddSection("Settings")
+-- -- section:SetLibrary(Fluent)
+-- -- section:BuildInterfaceSection(Tabs.Settings)
+-- SaveManager:SetLibrary(Fluent)
+-- section:SetLibrary(Fluent)
+-- section:BuildInterfaceSection(Tabs.Settings)
+-- SaveManager:BuildConfigSection(Tabs.Settings)
+-- Window:SelectTab(2 - 1)
 Window:SelectTab(1)
 Fluent:Notify({
     Title = "Ancestral",
