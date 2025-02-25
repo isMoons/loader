@@ -906,7 +906,7 @@ local function StartInstaReel()
                     if reel and reel.Enabled == true then
                         repeat
                             task.wait(math.random(2, 10) / 100) 
-                            ReplicatedStorage:WaitForChild("events"):WaitForChild("reelfinished "):FireServer(100, false)
+                            ReplicatedStorage:WaitForChild("events"):WaitForChild(" reelfinished "):FireServer(100, false)
                         until reelGui == nil
                     end
                 end
