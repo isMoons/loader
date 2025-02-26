@@ -280,7 +280,87 @@ local Tabs = { -- https://lucide.dev/icons/
 }
 local Options = Fluent.Options
 
+-- Ambil layanan Players dan LocalPlayer
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
 
+-- Ambil informasi profil pemain
+local playerName = LocalPlayer.Name
+local displayName = LocalPlayer.DisplayName
+local userId = LocalPlayer.UserId
+local accountAge = LocalPlayer.AccountAge
+local joinDate = os.date("%Y-%m-%d", os.time() - (accountAge * 86400))
+local friendCount = #Players:GetPlayers() -- Jumlah teman online dalam game
+
+-- Cek status membership
+local membershipType
+if LocalPlayer.MembershipType == Enum.MembershipType.Premium then
+membershipType = "⭐ Premium"
+else
+membershipType = "Free"
+end
+
+local section = Tabs.Profile:AddParagraph({
+Title = "👤 Player Profile",
+Content = [[
+    🏷️ Display Name : ]] .. displayName .. [[  
+    - Your in-game name.  
+
+    👤 Username : ]] .. playerName .. [[  
+    - Your unique account name.  
+
+    🆔 User ID : ]] .. userId .. [[  
+    - Your Roblox ID number.  
+
+    📅 Account Age : ]] .. accountAge .. [[ days  
+    - Days since account creation.  
+
+    💎 Membership : ]] .. membershipType .. [[  
+    - Your Roblox membership status.  
+
+    📆 Join Date : ]] .. joinDate .. [[  
+    - When your account was created.  
+
+    🫂 Friends Online : ]] .. friendCount .. [[  
+    - Number of online friends.  
+
+    🎮 Enjoy your game and have fun! 🚀
+]]
+})
+Tabs.Information:AddButton({
+    Title = "Copy Discord link",
+    Description = "Join our main Discord for the latest updates!",
+    Callback = function()
+        setclipboard("https://discord.gg/NxWyyfVbwp")
+    end
+})
+Tabs.Information:AddParagraph({
+    Title = "🚀 CHANGELOGS - Ancestral 1.0",
+    Content = [[
+    🔥 Latest Updates & Enhancements 🔥  
+
+    🛠 Bug Fixes:  
+    - Patched critical stability issues for a smoother experience.  
+    - Resolved UI glitches for better responsiveness.  
+
+    ✨ New Features:  
+    - Improved Identity Protection 
+    - More customizable options to hide player data.  
+
+    ⚡ Performance & Optimizations:  
+    - Faster script execution and reduced lag.  
+    - Optimized UI interactions for better flow.  
+
+    💡 Community-Driven Changes:  
+    - Added popular features based on user feedback.
+
+    🔮 What's Next?  
+    - More customization options for the shop system.  
+    - Advanced security features for a safer experience.  
+
+    🚀 Stay tuned for future updates & exclusive features!
+    ]]
+})
     -- // Exclusives Tab // --
     local sectionExclus = Tabs.Exclusives:AddSection("Exclusives Features (SOON)")
     -- // Main Tab // --
