@@ -446,23 +446,26 @@ local instantBobToggle = Tabs.Main:AddToggle("InstantBob", {
 })
 
 instantBobToggle:OnChanged(function()
-    if typeof(GetToggleValue) == "function" and CurrentTool then
+    if GetToggleValue and Utils.Character() then
         local isEnabled = GetToggleValue("InstantBob")
-        if isEnabled and CurrentTool then
-            local Bobber = CurrentTool:FindFirstChild("bobber")
-            if Bobber and Bobber:IsA("BasePart") then
+        local rod = Utils.Character():FindFirstChildOfClass("Tool")
+
+        if isEnabled and rod then
+            local Bobber = rod:FindFirstChild("bobber")
+            if Bobber then
                 local Params = RaycastParams.new()
                 Params.FilterType = Enum.RaycastFilterType.Include
                 Params.FilterDescendantsInstances = { workspace.Terrain }
 
-                local RaycastResult = workspace:Raycast(Bobber.Position, Vector3.new(0, -100, 0), Params)
-                if RaycastResult and RaycastResult.Instance and RaycastResult.Instance:IsA("Terrain") then
+                local RaycastResult = Utils.CastTo(Bobber.Position, Bobber.Position - Vector3.yAxis * 100, Params)
+                if RaycastResult and RaycastResult.Instance:IsA("Terrain") then
                     Bobber:PivotTo(CFrame.new(RaycastResult.Position))
                 end
             end
         end
     end
 end)
+
 
 
     -- Atur Delay
