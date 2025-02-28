@@ -681,9 +681,9 @@ Tabs.Items:AddButton({
         end
     end
 })
-local section = Tabs.Items:AddSection("Buy Any Item")
+local section = Tabs.Items:AddSection("Shop Items")
 
--- Pastikan folder item ditemukan
+-- Mengumpulkan daftar item dari folder
 local itemsFolder = game:GetService("ReplicatedStorage"):FindFirstChild("resources") and game:GetService("ReplicatedStorage").resources:FindFirstChild("items") and game:GetService("ReplicatedStorage").resources.items:FindFirstChild("items")
 local itemNames = {}
 
@@ -701,20 +701,7 @@ local ItemDropdown = Tabs.Items:AddDropdown("ItemSelection", {
     Title = "Select an Item",
     Values = itemNames,
     Multi = false,
-    Default = itemNames[1] or nil,
-})
-
--- Pastikan default value ada
-local selectedAmount = 1
-
-Tabs.Items:AddTextbox({
-    Title = "Amount",
-    Default = "1",
-    TextDisappear = true,
-    Callback = function(Value)
-        selectedAmount = tonumber(Value) or 1
-        print("Selected Amount:", selectedAmount)
-    end
+    Default = nil,
 })
 
 Tabs.Items:AddButton({
@@ -723,7 +710,6 @@ Tabs.Items:AddButton({
     Callback = function()
         local selectedItem = ItemDropdown.Value
         if selectedItem then
-            print("Purchasing:", selectedAmount, selectedItem) -- Debugging
             game:GetService("ReplicatedStorage").events.purchase:FireServer(selectedItem, "Item", nil, selectedAmount)
         else
             warn("No item selected!")
