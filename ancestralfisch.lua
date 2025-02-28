@@ -414,11 +414,11 @@ local function StartInstaReel()
                     if b:FindFirstChild("fish") and b:FindFirstChild("playerbar") then
                         b:FindFirstChild("playerbar").Position = b:FindFirstChild("fish").Position
                     end
-                    ReplicatedStorage:WaitForChild("events"):WaitForChild("reelfinished "):FireServer(100, math.random(0.1, 0.3) == 1)
+                    ReplicatedStorage:WaitForChild("events"):WaitForChild("reelfinished "):FireServer(100, math.random(0.1, 0.2) == 1)
                 end
                 if not ui then ui = false end
             until not ui
-            task.wait(math.random(0.1, 0.3) / 100)
+            task.wait(math.random(0.1, 0.2) / 100)
         end
     end)
 end 
@@ -648,7 +648,7 @@ end
     end)
     local section = Tabs.Items:AddSection("Shop")
     local rodsFolder = game:GetService("ReplicatedStorage"):WaitForChild("resources"):WaitForChild("items"):WaitForChild("rods")
-    local purchaseEvent = game:GetService("ReplicatedStorage"):WaitForChild("events"):WaitForChild("purchase ")
+    local purchaseEvent = game:GetService("ReplicatedStorage"):WaitForChild("events"):WaitForChild("purchase")
     
     -- Mengumpulkan nama semua pancingan dalam folder
     local rodNames = {}
