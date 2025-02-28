@@ -647,40 +647,60 @@ end
         end
     end)
     local section = Tabs.Items:AddSection("Shop")
-local rodsFolder = game:GetService("ReplicatedStorage").resources.items.rods
-local event = game:GetService("ReplicatedStorage").events.purchase
-
--- Mengumpulkan nama semua pancingan dalam folder
-local rodNames = {}
-for _, rod in ipairs(rodsFolder:GetChildren()) do
-    if rod:IsA("Folder") then
-        table.insert(rodNames, rod.Name)
-    end
-end
-
-local RodDropdown = Tabs.Items:AddDropdown("RodSelection", {
-    Title = "Select a Rod",
-    Values = rodNames,
-    Multi = false,
-    Default = nil,
-})
-
-Tabs.Items:AddButton({
-    Title = "Buy Selected Rod",
-    Description = "Purchase the selected fishing rod.",
-    Callback = function()
-        local selectedRod = RodDropdown.Value
-        if selectedRod then
-            local randomValue = math.random(1, 1) -- Ubah angka sesuai kebutuhan
-            -- Menggunakan task.delay untuk menunda eksekusi FireServer selama 1 detik
-            task.delay(math.random(0.1, 0.2), function()
-                event:FireServer(selectedRod, "Rod", randomValue, 1)
-            end)            
-        else
-            warn("No Rod selected!")
+    local rodsFolder = game:GetService("ReplicatedStorage"):WaitForChild("resources"):WaitForChild("items"):WaitForChild("rods")
+    local purchaseEvent = game:GetService("ReplicatedStorage"):WaitForChild("events"):WaitForChild("purchase")
+    
+    -- Mengumpulkan nama semua pancingan dalam folder
+    local rodNames = {}
+    for _, rod in ipairs(rodsFolder:GetChildren()) do
+        if rod:IsA("Folder") then
+            table.insert(rodNames, rod.Name)
         end
     end
-})
+    
+    local RodDropdown = Tabs.Items:AddDropdown("RodSelection", {
+        Title = "Select a Rod",
+        Values = rodNames,
+        Multi = false,
+        Default = nil,
+    })
+    
+    local function purchaseRods()
+        if not rodsFolder then
+            warn("Folder Rods not found")
+            return
+        end
+    
+        local quantity = math.huge -- Jumlah pembelian maksimum
+    
+        for _, rod in ipairs(rodsFolder:GetChildren()) do
+            if rod:IsA("Folder") then
+                local rodName = rod.Name
+                purchaseEvent:FireServer(rodName, "Rod", nil, quantity)
+            end
+        end
+    end
+    
+    Tabs.Items:AddButton({
+        Title = "Buy Selected Rod",
+        Description = "Purchase the selected fishing rod.",
+        Callback = function()
+            local selectedRod = RodDropdown.Value
+            if selectedRod then
+                local randomDelay = math.random(0.1, 0.2) -- Delay acak antara 0.1 - 0.2 detik
+    
+                task.delay(randomDelay, function()
+                    purchaseEvent:FireServer(selectedRod, "Rod", nil, 1)
+                end)
+    
+                -- Eksekusi pembelian semua rod dengan delay tambahan
+                task.delay(1, purchaseRods)
+            else
+                warn("No Rod selected!")
+            end
+        end
+    })
+    
 
 local section = Tabs.Misc:AddSection("Misc Feature (SOON)")
 -- Execute Information
