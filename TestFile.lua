@@ -446,16 +446,19 @@ local instantBobToggle = Tabs.Main:AddToggle("InstantBob", {
 })
 
 instantBobToggle:OnChanged(function()
-    if GetToggleValue("InstantBob") and CurrentTool then
-        local Bobber = CurrentTool:FindFirstChild("bobber")
-        if Bobber then
-            local Params = RaycastParams.new()
-            Params.FilterType = Enum.RaycastFilterType.Include
-            Params.FilterDescendantsInstances = { workspace.Terrain }
+    if GetToggleValue and CurrentTool then
+        local isEnabled = GetToggleValue("InstantBob")
+        if isEnabled and CurrentTool then
+            local Bobber = CurrentTool:FindFirstChild("bobber")
+            if Bobber then
+                local Params = RaycastParams.new()
+                Params.FilterType = Enum.RaycastFilterType.Include
+                Params.FilterDescendantsInstances = { workspace.Terrain }
 
-            local RaycastResult = workspace:Raycast(Bobber.Position, -Vector3.yAxis * 100, Params)
-            if RaycastResult and RaycastResult.Instance:IsA("Terrain") then
-                Bobber:PivotTo(CFrame.new(RaycastResult.Position))
+                local RaycastResult = workspace:Raycast(Bobber.Position, -Vector3.yAxis * 100, Params)
+                if RaycastResult and RaycastResult.Instance:IsA("Terrain") then
+                    Bobber:PivotTo(CFrame.new(RaycastResult.Position))
+                end
             end
         end
     end
