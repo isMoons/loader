@@ -283,15 +283,7 @@ local Tabs = { -- https://lucide.dev/icons/
 local Options = Fluent.Options
     -- Profile Tab
     local Profile = Tabs.Profile:AddSection("Profile (SOON)")
-    -- // Exclusives Tab // --
-    local sectionExclus = Tabs.Exclusives:AddSection("Exclusives Features")
-    Tabs.Exclusives:AddButton({
-		Title = "Show Ui Buy Boat",
-		Callback = function()
-			PlayerGui.hud.safezone.shipwright.Visible = not PlayerGui.hud.safezone.shipwright.Visible 
-		end
-	})
-end
+
     -- // Main Tab // --
     local Information = Tabs.Information:AddSection("Information (SOON)")
     -- // // // Auto Cast // // // --
@@ -732,7 +724,14 @@ Tabs.Items:AddButton({
         end
     end
 })
-
+-- // Exclusives Tab // --
+local sectionExclus = Tabs.Exclusives:AddSection("Exclusives Features")
+Tabs.Exclusives:AddButton({
+    Title = "Show Ui Buy Boat",
+    Callback = function()
+        PlayerGui.hud.safezone.shipwright.Visible = not PlayerGui.hud.safezone.shipwright.Visible 
+    end
+})
 local section = Tabs.Misc:AddSection("Misc Feature (SOON)")
 -- Execute Information
 Window:SelectTab(1)
