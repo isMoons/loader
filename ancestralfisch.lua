@@ -673,7 +673,7 @@ Tabs.Items:AddButton({
         if selectedRod then
             local randomValue = math.random(1, 1) -- Ubah angka sesuai kebutuhan
             -- Menggunakan task.delay untuk menunda eksekusi FireServer selama 1 detik
-            task.delay(math.random(0.1, 0.3), function()
+            task.delay(math.random(0.1, 0.0), function()
                 event:FireServer(selectedRod, "Rod", randomValue, 1)
             end)            
         else
