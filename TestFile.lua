@@ -446,10 +446,12 @@ local instantBobToggle = Tabs.Main:AddToggle("InstantBob", {
 })
 
 instantBobToggle:OnChanged(function()
-    if GetToggleValue and CurrentTool then
+    if GetToggleValue then
         local isEnabled = GetToggleValue("InstantBob")
-        if isEnabled and CurrentTool then
-            local Bobber = CurrentTool:FindFirstChild("bobber")
+        local rod = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Tool")
+
+        if isEnabled and rod then
+            local Bobber = rod:FindFirstChild("bobber")
             if Bobber then
                 local Params = RaycastParams.new()
                 Params.FilterType = Enum.RaycastFilterType.Include
