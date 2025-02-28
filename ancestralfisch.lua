@@ -269,7 +269,6 @@ local Tabs = { -- https://lucide.dev/icons/
     Profile = Window:AddTab({ Title = "Profile", Icon = Players:GetUserThumbnailAsync(LocalPlayer.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size100x100)}), 
     Information = Window:AddTab({ Title = "Information", Icon = "book" }), 
     Main = Window:AddTab({ Title = "Fishing", Icon = "anchor" }),
-    Items = Window:AddTab({ Title = "Forge", Icon = "hammer" }),
     CharacterTab = Window:AddTab({ Title = "Character", Icon = "user" }),
     Teleports = Window:AddTab({ Title = "Teleports", Icon = "compass" }), 
     Exclusives = Window:AddTab({ Title = "Exclusives", Icon = "star" }), 
@@ -616,72 +615,40 @@ local section = Tabs.Teleports:AddSection("Select Teleport")
 
 -- Menemukan folder teleportasi di dalam world
 local TpSpotsFolder = Workspace:FindFirstChild("world"):WaitForChild("spawns"):WaitForChild("TpSpots")
-for i, v in pairs(TpSpotsFolder:GetChildren()) do
-    if table.find(teleportSpots, v.Name) == nil then
+local teleportSpots = {}
+
+for _, v in pairs(TpSpotsFolder:GetChildren()) do
+    if not table.find(teleportSpots, v.Name) then
         table.insert(teleportSpots, v.Name)
     end
 end
-    -- Pastikan teleportSpots terurut alfabetis
-    table.sort(teleportSpots, function(a, b)
-        return a:lower() < b:lower()
-    end)
-    
-    local IslandTPDropdownUI = Tabs.Teleports:AddDropdown("IslandTPDropdownUI", {
-        Title = "Area Teleport",
-        Values = teleportSpots,
-        Multi = false,
-        Default = nil,
-    })
-    
-    IslandTPDropdownUI:OnChanged(function(Value)
-        if teleportSpots ~= nil and HumanoidRootPart ~= nil then
-            xpcall(function()
-                local target = TpSpotsFolder:FindFirstChild(Value)
-                if target then
-                    HumanoidRootPart.CFrame = target.CFrame + Vector3.new(0, 5, 0)
-                    IslandTPDropdownUI:SetValue(nil)
-                end
-            end, function(err)
-                warn("Teleport Error: ", err)
-            end)
-        end
-    end)
-    local section = Tabs.Items:AddSection("Shop")
-local rodsFolder = game:GetService("ReplicatedStorage").resources.items.rods
-local event = game:GetService("ReplicatedStorage").events.purchase
 
--- Mengumpulkan nama semua pancingan dalam folder
-local rodNames = {}
-for _, rod in ipairs(rodsFolder:GetChildren()) do
-    if rod:IsA("Folder") then
-        table.insert(rodNames, rod.Name)
-    end
-end
+-- Pastikan teleportSpots terurut alfabetis
+table.sort(teleportSpots, function(a, b)
+    return a:lower() < b:lower()
+end)
 
-local RodDropdown = Tabs.Items:AddDropdown("RodSelection", {
-    Title = "Select a Rod",
-    Values = rodNames,
+local IslandTPDropdownUI = Tabs.Teleports:AddDropdown("IslandTPDropdownUI", {
+    Title = "Area Teleport",
+    Values = teleportSpots,
     Multi = false,
     Default = nil,
 })
 
-Tabs.Items:AddButton({
-    Title = "Buy Selected Rod",
-    Description = "Purchase the selected fishing rod.",
-    Callback = function()
-        local selectedRod = RodDropdown.Value
-        if selectedRod then
-            local randomValue = math.random(50, 150) -- Ubah angka sesuai kebutuhan
-
-            -- Menggunakan task.delay untuk menunda eksekusi FireServer selama 1 detik
-            task.delay(1, function()
-                event:FireServer(selectedRod, "Rod", randomValue, 1)
-            end)
-        else
-            warn("No Rod selected!")
-        end
+Tabs.Teleports:AddButton("Teleport", function()
+    local Value = IslandTPDropdownUI.Value
+    if Value and HumanoidRootPart then
+        xpcall(function()
+            local target = TpSpotsFolder:FindFirstChild(Value)
+            if target then
+                HumanoidRootPart.CFrame = target.CFrame + Vector3.new(0, 5, 0)
+                IslandTPDropdownUI:SetValue(nil)
+            end
+        end, function(err)
+            warn("Teleport Error: ", err)
+        end)
     end
-})
+end)
 
 local section = Tabs.Misc:AddSection("Misc Feature (SOON)")
 -- Execute Information
