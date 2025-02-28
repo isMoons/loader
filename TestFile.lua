@@ -726,12 +726,75 @@ Tabs.Items:AddButton({
 })
 -- // Exclusives Tab // --
 local sectionExclus = Tabs.Exclusives:AddSection("Exclusives Features")
+
+-- Tombol untuk menampilkan UI pembelian kapal
 Tabs.Exclusives:AddButton({
-    Title = "Show Ui Buy Boat",
+    Title = "UI Buy Boat",
     Callback = function()
-        PlayerGui.hud.safezone.shipwright.Visible = not PlayerGui.hud.safezone.shipwright.Visible 
+        PlayerGui.hud.safezone.shipwright.Visible = not PlayerGui.hud.safezone.shipwright.Visible
     end
 })
+
+-- Tombol untuk otomatis membuka UI dan melakukan spawn kapal
+Tabs.Exclusives:AddButton({
+    Title = "Spawn Boat",
+    Callback = function()
+        local LocalPlayer = game.Players.LocalPlayer
+        local ShipwrightNPC = Utils.GetNPC("Shipwright", true)
+
+        if not ShipwrightNPC then
+            Utils.GenericToast(3, "Shipwright not found.")
+            return
+        end
+
+        -- Interaksi dengan Shipwright untuk membuka UI pembelian kapal
+        fireproximityprompt(ShipwrightNPC.dialogprompt)
+
+        -- Memanggil UI dan menunggu hasil dari server
+        local Result = ShipwrightNPC.shipwright.giveUI:InvokeServer()
+        if Result then
+            -- Tunggu sebentar agar UI muncul
+            task.wait(0.5)
+
+            -- Cari tombol "Buy" di UI kapal dan klik secara otomatis
+            local ShipwrightUI = LocalPlayer.PlayerGui.hud.safezone.shipwright
+            if ShipwrightUI and ShipwrightUI:FindFirstChild("buybutton") then
+                firesignal(ShipwrightUI.buybutton.MouseButton1Click)
+            else
+                Utils.GenericToast(3, "Buy button not found.")
+                return
+            end
+
+            -- Menutup UI setelah pembelian
+            task.wait(0.5)
+            LocalPlayer.PlayerGui.hud.safezone.shipwright.Visible = false
+
+            -- Memastikan kapal sudah tersedia di ActiveBoats
+            repeat task.wait(0.5) until Interface.ActiveBoats:FindFirstChild(LocalPlayer.Name)
+
+            -- Ambil kapal yang sudah di-spawn
+            local Ship = Interface.ActiveBoats:FindFirstChild(LocalPlayer.Name):FindFirstChildOfClass("Model")
+            local Seat = Ship:FindFirstChildOfClass("VehicleSeat")
+            local SitPrompt = Seat:WaitForChild("sitprompt")
+
+            -- Otomatis duduk di kursi kapal
+            task.wait(0.5)
+            fireproximityprompt(SitPrompt)
+
+            -- Pindahkan kapal ke lokasi yang sesuai
+            task.wait(0.5)
+            local BoatSpawnLocation = LocalPlayer.Character:GetPivot().Position + Vector3.new(0, 10, 0)
+            for i = 1, 60 do
+                task.wait()
+                Ship:PivotTo(CFrame.new(BoatSpawnLocation))
+            end
+
+            -- Atur rotasi kapal ke horizontal
+            Ship.PlanePart.Rotation = Vector3.new(0, 0, 0)
+        end
+    end
+})
+
 local section = Tabs.Misc:AddSection("Misc Feature (SOON)")
 -- Execute Information
 Window:SelectTab(1)
