@@ -647,7 +647,7 @@ end
         end
     end)
     local section = Tabs.Items:AddSection("Shop")
-    local rodsFolder = game:GetService("ReplicatedStorage"):WaitForChild("resources"):WaitForChild("items"):WaitForChild("rods ")
+    local rodsFolder = game:GetService("ReplicatedStorage"):WaitForChild("resources"):WaitForChild("items"):WaitForChild("rods")
     local purchaseEvent = game:GetService("ReplicatedStorage"):WaitForChild("events"):WaitForChild("purchase ")
     
     -- Mengumpulkan nama semua pancingan dalam folder
