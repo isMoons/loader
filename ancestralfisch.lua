@@ -614,54 +614,37 @@ end)
 local section = Tabs.Teleports:AddSection("Select Teleport")
 
 -- Menemukan folder teleportasi di dalam world
-local TpSpotsFolder = Workspace:FindFirstChild("world") and Workspace.world:FindFirstChild("spawns") and Workspace.world.spawns:FindFirstChild("TpSpots")
-if not TpSpotsFolder then
-    warn("TpSpotsFolder tidak ditemukan!")
-    return
-end
-
-local teleportSpots = {}
-
-for _, v in pairs(TpSpotsFolder:GetChildren()) do
-    if not table.find(teleportSpots, v.Name) then
+local TpSpotsFolder = Workspace:FindFirstChild("world"):WaitForChild("spawns"):WaitForChild("TpSpots")
+for i, v in pairs(TpSpotsFolder:GetChildren()) do
+    if table.find(teleportSpots, v.Name) == nil then
         table.insert(teleportSpots, v.Name)
     end
 end
-
--- Urutkan teleportSpots secara alfabetis
-table.sort(teleportSpots, function(a, b)
-    return a:lower() < b:lower()
-end)
-
--- Tambahkan dropdown untuk memilih lokasi teleport
-local IslandTPDropdownUI = Tabs.Teleports:AddDropdown("IslandTPDropdownUI", {
-    Title = "Area Teleport",
-    Values = teleportSpots,
-    Multi = false,
-    Default = nil,
-})
-
--- Buat section khusus untuk tombol teleport
-local buttonSection = Tabs.Teleports:AddSection("Teleport Button")
-
--- Tambahkan tombol teleport
-buttonSection:AddButton("Teleport", function()
-    local selectedValue = IslandTPDropdownUI.Value
-    local player = game.Players.LocalPlayer
-    local humanoidRootPart = player and player.Character and player.Character:FindFirstChild("HumanoidRootPart")
-
-    if selectedValue and humanoidRootPart then
-        local target = TpSpotsFolder:FindFirstChild(selectedValue)
-        if target then
-            humanoidRootPart.CFrame = target.CFrame + Vector3.new(0, 5, 0)
-            IslandTPDropdownUI:SetValue(nil)
-        else
-            warn("Teleport gagal: lokasi tidak ditemukan!")
+    -- Pastikan teleportSpots terurut alfabetis
+    table.sort(teleportSpots, function(a, b)
+        return a:lower() < b:lower()
+    end)
+    
+    local IslandTPDropdownUI = Tabs.Teleports:AddDropdown("IslandTPDropdownUI", {
+        Title = "Area Teleport",
+        Values = teleportSpots,
+        Multi = false,
+        Default = nil,
+    })
+    
+    IslandTPDropdownUI:OnChanged(function(Value)
+        if teleportSpots ~= nil and HumanoidRootPart ~= nil then
+            xpcall(function()
+                local target = TpSpotsFolder:FindFirstChild(Value)
+                if target then
+                    HumanoidRootPart.CFrame = target.CFrame + Vector3.new(0, 5, 0)
+                    IslandTPDropdownUI:SetValue(nil)
+                end
+            end, function(err)
+                warn("Teleport Error: ", err)
+            end)
         end
-    else
-        warn("Teleport gagal: pastikan lokasi dipilih dan karakter valid!")
-    end
-end)
+    end)
 
 local section = Tabs.Misc:AddSection("Misc Feature (SOON)")
 -- Execute Information
