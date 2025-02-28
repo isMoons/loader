@@ -616,22 +616,12 @@ local section = Tabs.Teleports:AddSection("Select Teleport")
 -- Menemukan folder teleportasi di dalam world
 local TpSpotsFolder = Workspace:FindFirstChild("world"):WaitForChild("spawns"):WaitForChild("TpSpots")
 
--- Pastikan teleportSpots ada
-teleportSpots = teleportSpots or {}
-
--- Memasukkan nama tempat teleportasi ke dalam tabel
-for _, v in pairs(TpSpotsFolder:GetChildren()) do
-    if not table.find(teleportSpots, v.Name) then
-        table.insert(teleportSpots, v.Name)
-    end
-end
-
 -- Pastikan teleportSpots terurut alfabetis
 table.sort(teleportSpots, function(a, b)
     return a:lower() < b:lower()
 end)
 
--- Dropdown untuk memilih area teleportasi
+-- Dropdown untuk memilih lokasi teleportasi
 local IslandTPDropdownUI = Tabs.Teleports:AddDropdown("IslandTPDropdownUI", {
     Title = "Area Teleport",
     Values = teleportSpots,
@@ -639,23 +629,28 @@ local IslandTPDropdownUI = Tabs.Teleports:AddDropdown("IslandTPDropdownUI", {
     Default = nil,
 })
 
--- Tombol untuk melakukan teleportasi
+-- Tombol untuk teleportasi
 Tabs.Teleports:AddButton({
-    Title = "Teleport to selection",
+    Title = "Teleport",
     Callback = function()
         local selectedValue = IslandTPDropdownUI.Value
         if selectedValue and HumanoidRootPart then
-            local target = TpSpotsFolder:FindFirstChild(selectedValue)
-            if target then
-                HumanoidRootPart.CFrame = target.CFrame + Vector3.new(0, 5, 0)
-            else
-                warn("Teleport target not found: ", selectedValue)
-            end
+            xpcall(function()
+                local target = TpSpotsFolder:FindFirstChild(selectedValue)
+                if target then
+                    HumanoidRootPart.CFrame = target.CFrame + Vector3.new(0, 5, 0)
+                else
+                    warn("Teleport target not found: ", selectedValue)
+                end
+            end, function(err)
+                warn("Teleport Error: ", err)
+            end)
         else
             warn("No teleport selection made or HumanoidRootPart is missing!")
         end
     end
 })
+
 
 
 local section = Tabs.Misc:AddSection("Misc Feature (SOON)")
