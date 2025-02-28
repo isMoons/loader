@@ -631,6 +631,7 @@ table.sort(teleportSpots, function(a, b)
     return a:lower() < b:lower()
 end)
 
+-- Dropdown untuk memilih area teleportasi
 local IslandTPDropdownUI = Tabs.Teleports:AddDropdown("IslandTPDropdownUI", {
     Title = "Area Teleport",
     Values = teleportSpots,
@@ -638,34 +639,24 @@ local IslandTPDropdownUI = Tabs.Teleports:AddDropdown("IslandTPDropdownUI", {
     Default = nil,
 })
 
--- Fungsi teleportasi utama
-local function TeleportToSelection()
-    local selectedValue = IslandTPDropdownUI.Value
-    if selectedValue and HumanoidRootPart then
-        local target = TpSpotsFolder:FindFirstChild(selectedValue)
-        if target then
-            HumanoidRootPart.CFrame = target.CFrame + Vector3.new(0, 5, 0)
-            IslandTPDropdownUI:SetValue(nil) -- Reset dropdown setelah teleportasi
-        else
-            warn("Teleport target not found: ", selectedValue)
-        end
-    else
-        warn("No teleport selection made or HumanoidRootPart is missing!")
-    end
-end
-
--- Event saat dropdown berubah
-IslandTPDropdownUI:OnChanged(function()
-    TeleportToSelection()
-end)
-
--- Tombol untuk teleportasi manual
+-- Tombol untuk melakukan teleportasi
 Tabs.Teleports:AddButton({
     Title = "Teleport to selection",
     Callback = function()
-        TeleportToSelection()
+        local selectedValue = IslandTPDropdownUI.Value
+        if selectedValue and HumanoidRootPart then
+            local target = TpSpotsFolder:FindFirstChild(selectedValue)
+            if target then
+                HumanoidRootPart.CFrame = target.CFrame + Vector3.new(0, 5, 0)
+            else
+                warn("Teleport target not found: ", selectedValue)
+            end
+        else
+            warn("No teleport selection made or HumanoidRootPart is missing!")
+        end
     end
 })
+
 
 local section = Tabs.Misc:AddSection("Misc Feature (SOON)")
 -- Execute Information
