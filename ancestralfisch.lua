@@ -652,29 +652,36 @@ end
     
     -- Mengumpulkan nama semua pancingan dalam folder
     local rodNames = {}
-    for _, rod in pairs(rodsFolder:GetChildren()) do
+    for _, rod in ipairs(rodsFolder:GetChildren()) do
         if rod:IsA("Folder") then
             table.insert(rodNames, rod.Name)
         end
     end
+    
     local RodDropdown = Tabs.Items:AddDropdown("RodSelection", {
         Title = "Select a Rod",
         Values = rodNames,
         Multi = false,
         Default = nil,
     })
+    
     Tabs.Items:AddButton({
         Title = "Buy Selected Rod",
         Description = "Purchase the selected fishing rod.",
         Callback = function()
             local selectedRod = RodDropdown.Value
             if selectedRod then
-                event:FireServer(selectedRod, "Rod ", nil, 1)
+                local randomDelay = math.random(1, 3) -- Delay antara 1-3 detik
+                task.wait(randomDelay) -- Menunggu sebelum mengirim event
+    
+                local randomValue = math.random(50, 150) -- Ubah angka sesuai kebutuhan
+                event:FireServer(selectedRod, "Rod", randomValue, 1)
             else
                 warn("No Rod selected!")
             end
         end
     })
+    
 local section = Tabs.Misc:AddSection("Misc Feature (SOON)")
 -- Execute Information
 Window:SelectTab(1)
