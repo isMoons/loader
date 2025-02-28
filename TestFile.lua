@@ -284,7 +284,14 @@ local Options = Fluent.Options
     -- Profile Tab
     local Profile = Tabs.Profile:AddSection("Profile (SOON)")
     -- // Exclusives Tab // --
-    local sectionExclus = Tabs.Exclusives:AddSection("Exclusives Features (SOON)")
+    local sectionExclus = Tabs.Exclusives:AddSection("Exclusives Features")
+    Tabs.Exclusives:AddButton({
+		Title = "Show Ui Buy Boat",
+		Callback = function()
+			PlayerGui.hud.safezone.shipwright.Visible = not PlayerGui.hud.safezone.shipwright.Visible 
+		end
+	})
+end
     -- // Main Tab // --
     local Information = Tabs.Information:AddSection("Information (SOON)")
     -- // // // Auto Cast // // // --
@@ -365,34 +372,8 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local PlayerGui = game:GetService("Players").LocalPlayer:FindFirstChild("PlayerGui")
 
 -- // // // Zone Cast // // // --
-ZoneConnection = LocalCharacter.ChildAdded:Connect(function(child)
-    if ZoneCast and child:IsA("Tool") and FishingZonesFolder:FindFirstChild(Zone) ~= nil then
-        child.ChildAdded:Connect(function(blehh)
-            if blehh.Name == "bobber" then
-                local RopeConstraint = blehh:FindFirstChildOfClass("RopeConstraint")
-                if ZoneCast and RopeConstraint ~= nil then
-                    -- Atur panjang tali agar pendek (misalnya 0.1)
-                    RopeConstraint.Length = 0.1
-                end
-                -- Tunggu sebentar agar perubahan diterapkan
-                task.wait(0.1)
-
-                -- Loop untuk memastikan bobber tetap di zona pemancingan
-                while WaitForSomeone(RenderStepped) do
-                    if ZoneCast and blehh.Parent ~= nil then
-                        task.wait()
-                        blehh.CFrame = FishingZonesFolder[Zone].CFrame
-                    else
-                        break
-                    end
-                end
-            end
-        end)
-    end
-end)
-
-
     local section = Tabs.Main:AddSection("Auto Fishing")
+
     -- AutoCastToggle
     local autoCast = Tabs.Main:AddToggle("autoCast", { Title = "Auto Cast", Default = false })
     -- AutoShakeToggle
