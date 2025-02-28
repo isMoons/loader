@@ -440,43 +440,26 @@ instaReelToggle:OnChanged(function()
 end)
 
 -- Instant Bobber
--- Utils Module
-local Utils = {}
-
-function Utils.CastTo(A: Vector3, B: Vector3, Params: RaycastParams): RaycastResult?
-    local Direction = (B - A)
-    return workspace:Raycast(A, Direction, Params)
-end
-
--- Instant Bobber
-local instantBobToggle = CastingGroup:AddToggle("InstantBob", {
+local instantBobToggle = Tabs.Main:AddToggle("InstantBob", {
     Title = "Instant Bobber",
     Default = false,
-}):OnChanged(function()
-    if GetToggleValue("InstantBob") then
-        task.spawn(function()
-            while GetToggleValue("InstantBob") do
-                if CurrentTool then
-                    local Bobber = CurrentTool:FindFirstChild("bobber")
-                    if Bobber then
-                        local Params = RaycastParams.new()
-                        Params.FilterType = Enum.RaycastFilterType.Include
-                        Params.FilterDescendantsInstances = { workspace.Terrain }
+})
 
-                        local RaycastResult = Utils.CastTo(Bobber.Position, Bobber.Position - Vector3.yAxis * 100, Params)
-                        if RaycastResult and RaycastResult.Instance:IsA("Terrain") then
-                            Bobber:PivotTo(CFrame.new(RaycastResult.Position))
-                        end
-                    end
-                end
-                task.wait(0.1) -- Beri delay agar tidak membebani performa
+instantBobToggle:OnChanged(function()
+    if GetToggleValue("InstantBob") and CurrentTool then
+        local Bobber = CurrentTool:FindFirstChild("bobber")
+        if Bobber then
+            local Params = RaycastParams.new()
+            Params.FilterType = Enum.RaycastFilterType.Include
+            Params.FilterDescendantsInstances = { workspace.Terrain }
+
+            local RaycastResult = workspace:Raycast(Bobber.Position, -Vector3.yAxis * 100, Params)
+            if RaycastResult and RaycastResult.Instance:IsA("Terrain") then
+                Bobber:PivotTo(CFrame.new(RaycastResult.Position))
             end
-        end)
+        end
     end
 end)
-
-return Utils
-
 
     -- Atur Delay
     local autoFishSettings = Tabs.Main:AddSection("Auto Fish Settings")
