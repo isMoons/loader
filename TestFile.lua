@@ -287,6 +287,14 @@ local Options = Fluent.Options
 
     -- // Main Tab // --
     local Information = Tabs.Information:AddSection("Information (SOON)")
+    do
+        Tabs.Information:AddButton({
+            Title = "Copy Discord link",
+            Description = "Join our discord to see next update!",
+            Callback = function()
+                setclipboard("https://discord.gg/dJmUxnAfbq")
+            end
+        })
     -- Config
     local Config = Tabs.Config:AddSection("Setup")
     local fishZones = {}
