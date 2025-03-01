@@ -1,5 +1,5 @@
-local lib = loadstring(game:HttpGet("https://you.whimper.xyz/sources/lunor/Backup/Backend/ObfuscatedSource"))()
-local FlagsManager = loadstring(game:HttpGet("https://you.whimper.xyz/sources/lunor/Backup/Backend/ObfuscatedConfigSource"))()
+local lib = loadstring(game:HttpGet("https://raw.githubusercontent.com/isMoons/loader/refs/heads/main/ObfuscatedSource"))()
+local FlagsManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/isMoons/loader/refs/heads/main/ObfuscatedConfigSource"))()
 
 -- print = function() end
 -- warn = function() end
