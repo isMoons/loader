@@ -273,6 +273,7 @@ end
 local Tabs = { -- https://lucide.dev/icons/
     Profile = Window:AddTab({ Title = "Profile", Icon = Players:GetUserThumbnailAsync(LocalPlayer.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size100x100)}), 
     Information = Window:AddTab({ Title = "Information", Icon = "book" }), 
+    Config = Window:AddTab({ Title = "Config", Icon = "boxes" }),
     Main = Window:AddTab({ Title = "Fishing", Icon = "anchor" }),
     Items = Window:AddTab({ Title = "Forge", Icon = "hammer" }), 
     CharacterTab = Window:AddTab({ Title = "Character", Icon = "user" }),
@@ -286,6 +287,76 @@ local Options = Fluent.Options
 
     -- // Main Tab // --
     local Information = Tabs.Information:AddSection("Information (SOON)")
+    
+    local Config = Tabs.Config:AddSection("Setup")
+    -- Import DataStoreService
+local DataStoreService = game:GetService("DataStoreService")
+local fishZoneStore = DataStoreService:GetDataStore("FishingZones")
+
+-- Table untuk menyimpan zona memancing
+local fishZones = {}
+
+-- Load zona dari DataStore
+local success, storedZones = pcall(function()
+    return fishZoneStore:GetAsync(LocalPlayer.UserId)
+end)
+if success and storedZones then
+    fishZones = storedZones
+end
+
+-- UI Dropdown untuk memilih zona memancing
+local fishZoneDropdown = Tabs.Config:AddDropdown("FishZoneDropdown", {
+    Title = "Select Fishing Zone",
+    Values = table.keys(fishZones),
+    Multi = false,
+    Default = nil,
+})
+
+-- Input Box untuk Nama Zona
+local zoneNameInput = Tabs.Config:AddInput("ZoneNameInput", {
+    Title = "Zone Name",
+    Default = "Fishing Spot",
+    Placeholder = "Enter zone name...",
+})
+
+-- Button untuk membuat zona baru
+Tabs.Config:AddButton({
+    Title = "Create Fish Zone",
+    Description = "Save current location as a Fishing Zone (Persistent)",
+    Callback = function()
+        local playerPos = LocalPlayer.Character.HumanoidRootPart.CFrame
+        local zoneName = zoneNameInput.Value ~= "" and zoneNameInput.Value or "Zone " .. tostring(#fishZones + 1)
+        
+        -- Simpan zona baru ke table
+        fishZones[zoneName] = playerPos
+        
+        -- Simpan ke DataStore
+        local saveSuccess, errorMessage = pcall(function()
+            fishZoneStore:SetAsync(LocalPlayer.UserId, fishZones)
+        end)
+        
+        if saveSuccess then
+            -- Update Dropdown UI
+            table.insert(fishZoneDropdown.Values, zoneName)
+            fishZoneDropdown:SetValues(fishZoneDropdown.Values)
+            
+            -- Notify user
+            Fluent:Notify({
+                Title = "Fishing Zone",
+                Content = "Created new zone: " .. zoneName,
+                Duration = 5
+            })
+        else
+            -- Notify user about failure
+            Fluent:Notify({
+                Title = "Error",
+                Content = "Failed to save zone: " .. errorMessage,
+                Duration = 5,
+                Type = "error"
+            })
+        end
+    end
+})
     -- // // // Auto Cast // // // --
 local autoCastEnabled = false
     -- // // // Auto Shake // // // --
