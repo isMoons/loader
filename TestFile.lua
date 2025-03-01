@@ -309,97 +309,49 @@ local Options = Fluent.Options
             end
         })
     -- Config
--- Import DataStoreService
-local DataStoreService = game:GetService("DataStoreService")
-local fishZoneStore = DataStoreService:GetDataStore("FishingZones")
-
-local Config = Tabs.Config:AddSection("Save Zone")
-
--- Table untuk menyimpan zona memancing
-local fishZones = {}
-
--- Fungsi untuk mendapatkan semua kunci dalam tabel
-local function getKeys(tbl)
-    local keys = {}
-    for key, _ in pairs(tbl) do
-        table.insert(keys, key)
-    end
-    return keys
-end
-
--- Load zona dari DataStore saat pemain masuk
-local success, storedZones = pcall(function()
-    return fishZoneStore:GetAsync(LocalPlayer.UserId)
-end)
-
-if success and type(storedZones) == "table" then
-    fishZones = storedZones
-else
-    fishZones = {} -- Pastikan fishZones tetap tabel valid
-end
-
--- UI Dropdown untuk memilih zona memancing
-local fishZoneDropdown = Tabs.Config:AddDropdown("FishZoneDropdown", {
-    Title = "Select Fishing Zone",
-    Values = getKeys(fishZones), -- Gunakan fungsi untuk mendapatkan daftar zona
-    Multi = false,
-    Default = nil,
-})
-
--- Input Box untuk Nama Zona
-local zoneNameInput = Tabs.Config:AddInput("ZoneNameInput", {
-    Title = "Zone Name",
-    Default = "Fishing Spot",
-    Placeholder = "Enter zone name...",
-})
-
--- Button untuk membuat zona baru
-Tabs.Config:AddButton({
-    Title = "Create Fish Zone",
-    Description = "Save current location as a Fishing Zone (Persistent)",
-    Callback = function()
-        local playerPos = LocalPlayer.Character.HumanoidRootPart.CFrame
-        local zoneName = zoneNameInput.Value ~= "" and zoneNameInput.Value or "Zone " .. tostring(#getKeys(fishZones) + 1)
-        
-        -- Simpan zona baru ke table
-        fishZones[zoneName] = { X = playerPos.X, Y = playerPos.Y, Z = playerPos.Z }
-
-        -- Simpan ke DataStore
-        local saveSuccess, errorMessage = pcall(function()
-            fishZoneStore:SetAsync(LocalPlayer.UserId, fishZones)
-        end)
-
-        if saveSuccess then
+    local Config = Tabs.Config:AddSection("Save Zone")
+    local fishZones = {}
+    local fishZoneDropdown = Tabs.Config:AddDropdown("FishZoneDropdown", {
+        Title = "Select Fishing Zone",
+        Values = {},
+        Multi = false,
+        Default = nil,
+    })
+    local zoneNameInput = Tabs.Config:AddInput("ZoneNameInput", {
+        Title = "Zone Name",
+        Default = "Fishing Spot",
+        Placeholder = "Enter zone name...",
+    })
+    Tabs.Config:AddButton({
+        Title = "Create Fish Zone",
+        Description = "Save current location as a Fishing Zone (Will Be Deleted If Rejoin Game)",
+        Callback = function()
+            local playerPos = LocalPlayer.Character.HumanoidRootPart.CFrame
+            local zoneName = zoneNameInput.Value ~= "" and zoneNameInput.Value or "Zone " .. tostring(#fishZones + 1)
+    
+            -- Simpan zona baru ke table
+            fishZones[zoneName] = playerPos
+    
             -- Update Dropdown UI
-            fishZoneDropdown:SetValues(getKeys(fishZones))
-
+            table.insert(fishZoneDropdown.Values, zoneName)
+            fishZoneDropdown:SetValues(fishZoneDropdown.Values)
+    
             -- Notify user
             Fluent:Notify({
                 Title = "Fishing Zone",
                 Content = "Created new zone: " .. zoneName,
                 Duration = 5
             })
-        else
-            -- Notify user jika gagal menyimpan
-            Fluent:Notify({
-                Title = "Error",
-                Content = "Failed to save zone: " .. errorMessage,
-                Duration = 5,
-                Type = "error"
-            })
         end
-    end
-})
-
--- Saat memilih zona, teleport ke lokasi tersebut
-fishZoneDropdown:OnChanged(function(selectedZone)
-    if fishZones[selectedZone] and LocalPlayer.Character then
-        local pos = fishZones[selectedZone]
-        local targetPos = CFrame.new(pos.X, pos.Y + 3, pos.Z) -- Sedikit di atas agar tetap stabil
-        LocalPlayer.Character.HumanoidRootPart.CFrame = targetPos
-    end
-end)
-
+    })
+    
+    -- Saat memilih zona, teleport ke lokasi tersebut
+    fishZoneDropdown:OnChanged(function(selectedZone)
+        if fishZones[selectedZone] and LocalPlayer.Character then
+            local targetPos = fishZones[selectedZone] * CFrame.new(0, 3, 0) -- Sedikit di atas agar tetap stabil
+            LocalPlayer.Character.HumanoidRootPart.CFrame = targetPos
+        end
+    end)
     -- // // // Auto Cast // // // --
 local autoCastEnabled = false
     -- // // // Auto Shake // // // --
@@ -852,13 +804,55 @@ Tabs.Items:AddButton({
     end
 })
 -- // Exclusives Tab // --
+-- Import Players
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+-- Referensi ke objek di workspace
+local Active = workspace:WaitForChild("active")
+local ActiveBoats = Active:WaitForChild("boats")
+
+-- UI Section untuk fitur eksklusif di Fluent UI Darwis
 local sectionExclus = Tabs.Exclusives:AddSection("Exclusives Features")
+
+-- Tombol untuk membuka UI pembelian kapal
 Tabs.Exclusives:AddButton({
     Title = "UI Buy Boat",
     Callback = function()
-        PlayerGui.hud.safezone.shipwright.Visible = not PlayerGui.hud.safezone.shipwright.Visible 
+        LocalPlayer.PlayerGui.hud.safezone.shipwright.Visible = not LocalPlayer.PlayerGui.hud.safezone.shipwright.Visible
     end
 })
+
+-- Tombol untuk memanggil kapal
+Tabs.Exclusives:AddButton({
+    Title = "Spawn Boat",
+    Callback = function()
+        local BoatName = "DefaultBoat" -- Bisa diganti dengan input dari UI jika diperlukan
+
+        -- Kirim permintaan ke server untuk memunculkan kapal
+        local success, err = pcall(function()
+            Utils.Net("RF", "Boats/Spawn"):InvokeServer(BoatName)
+            Utils.Net("RE", "Boats/Close"):FireServer()
+            LocalPlayer.PlayerGui.hud.safezone.shipwright.Visible = false
+        end)
+
+        -- Jika terjadi error, tampilkan notifikasi di Fluent UI Darwis
+        if not success then
+            Fluent:Notify({
+                Title = "Error",
+                Content = "Failed to spawn boat: " .. tostring(err),
+                Duration = 5,
+                Type = "error"
+            })
+        end
+
+        -- Menunggu hingga kapal muncul di ActiveBoats
+        repeat
+            task.wait(0.5)
+        until ActiveBoats:FindFirstChild(LocalPlayer.Name)
+    end
+})
+
 local section = Tabs.Misc:AddSection("Misc Feature (SOON)")
 -- Execute Information
 Window:SelectTab(1)
