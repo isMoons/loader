@@ -294,6 +294,7 @@ local Options = Fluent.Options
                 setclipboard("https://discord.gg/dJmUxnAfbq")
             end
         })
+        local Information = Tabs.Information:AddSection("Youtube")
         Tabs.Information:AddButton({
             Title = "Copy Youtube Link",
             Description = "Support me with subscribe! :D",
