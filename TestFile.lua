@@ -410,7 +410,7 @@ local Options = Fluent.Options
      -- Auto Shake End
      -- // Mode Tab // --
      local section = Tabs.Config:AddSection("Mode Fishing")
-     local autoShakeMode = Tabs.Main:AddDropdown("autoShakeMode", {
+     local autoShakeMode = Tabs.Config:AddDropdown("autoShakeMode", {
          Title = "Auto Shake Mode",
          Values = {"Navigation"},
          Multi = false,
