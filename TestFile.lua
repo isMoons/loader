@@ -287,88 +287,58 @@ local Options = Fluent.Options
 
     -- // Main Tab // --
     local Information = Tabs.Information:AddSection("Information (SOON)")
+    local Config = Tabs.Config:AddSection("Setup")
+    local section = Tabs.Main:AddSection("Auto Fishing")
 
- local Config = Tabs.Config:AddSection("Setup")
-
--- Import DataStoreService
-local DataStoreService = game:GetService("DataStoreService")
-local fishZoneStore = DataStoreService:GetDataStore("FishingZones")
-
--- Table untuk menyimpan zona memancing
-local fishZones = {}
-
--- Load zona dari DataStore
-local success, storedZones = pcall(function()
-    return fishZoneStore:GetAsync(LocalPlayer.UserId)
-end)
-
-if success and type(storedZones) == "table" then
-    fishZones = storedZones
-else
-    fishZones = {} -- Pastikan fishZones tetap tabel valid
-end
-
--- Fungsi untuk mendapatkan semua kunci dalam tabel
-local function getKeys(tbl)
-    local keys = {}
-    for key, _ in pairs(tbl) do
-        table.insert(keys, key)
-    end
-    return keys
-end
-
--- UI Dropdown untuk memilih zona memancing
-local fishZoneDropdown = Tabs.Config:AddDropdown("FishZoneDropdown", {
-    Title = "Select Fishing Zone",
-    Values = getKeys(fishZones), -- Menggunakan fungsi getKeys
-    Multi = false,
-    Default = nil,
-})
-
--- Input Box untuk Nama Zona
-local zoneNameInput = Tabs.Config:AddInput("ZoneNameInput", {
-    Title = "Zone Name",
-    Default = "Fishing Spot",
-    Placeholder = "Enter zone name...",
-})
-
--- Button untuk membuat zona baru
-Tabs.Config:AddButton({
-    Title = "Create Fish Zone",
-    Description = "Save current location as a Fishing Zone (Persistent)",
-    Callback = function()
-        local playerPos = LocalPlayer.Character.HumanoidRootPart.CFrame
-        local zoneName = zoneNameInput.Value ~= "" and zoneNameInput.Value or "Zone " .. tostring(#getKeys(fishZones) + 1)
-        
-        -- Simpan zona baru ke table
-        fishZones[zoneName] = playerPos
-        
-        -- Simpan ke DataStore
-        local saveSuccess, errorMessage = pcall(function()
-            fishZoneStore:SetAsync(LocalPlayer.UserId, fishZones)
-        end)
-        
-        if saveSuccess then
+    -- Table untuk menyimpan zona memancing
+    local fishZones = {}
+    
+    -- UI Dropdown untuk memilih zona memancing
+    local fishZoneDropdown = Tabs.Main:AddDropdown("FishZoneDropdown", {
+        Title = "Select Fishing Zone",
+        Values = {},
+        Multi = false,
+        Default = nil,
+    })
+    
+    -- Input Box untuk Nama Zona
+    local zoneNameInput = Tabs.Main:AddInput("ZoneNameInput", {
+        Title = "Zone Name",
+        Default = "Fishing Spot",
+        Placeholder = "Enter zone name...",
+    })
+    
+    -- Button untuk membuat zona baru
+    Tabs.Main:AddButton({
+        Title = "Create Fish Zone",
+        Description = "Save current location as a Fishing Zone (Will Be Deleted If Rejoin Game)",
+        Callback = function()
+            local playerPos = LocalPlayer.Character.HumanoidRootPart.CFrame
+            local zoneName = zoneNameInput.Value ~= "" and zoneNameInput.Value or "Zone " .. tostring(#fishZones + 1)
+    
+            -- Simpan zona baru ke table
+            fishZones[zoneName] = playerPos
+    
             -- Update Dropdown UI
-            fishZoneDropdown:SetValues(getKeys(fishZones)) -- Update dengan fungsi getKeys
-            
+            table.insert(fishZoneDropdown.Values, zoneName)
+            fishZoneDropdown:SetValues(fishZoneDropdown.Values)
+    
             -- Notify user
             Fluent:Notify({
                 Title = "Fishing Zone",
                 Content = "Created new zone: " .. zoneName,
                 Duration = 5
             })
-        else
-            -- Notify user about failure
-            Fluent:Notify({
-                Title = "Error",
-                Content = "Failed to save zone: " .. errorMessage,
-                Duration = 5,
-                Type = "error"
-            })
         end
-    end
-})
+    })
+    
+    -- Saat memilih zona, teleport ke lokasi tersebut
+    fishZoneDropdown:OnChanged(function(selectedZone)
+        if fishZones[selectedZone] and LocalPlayer.Character then
+            local targetPos = fishZones[selectedZone] * CFrame.new(0, 3, 0) -- Sedikit di atas agar tetap stabil
+            LocalPlayer.Character.HumanoidRootPart.CFrame = targetPos
+        end
+    end)
     -- // // // Auto Cast // // // --
 local autoCastEnabled = false
     -- // // // Auto Shake // // // --
