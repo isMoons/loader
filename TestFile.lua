@@ -804,13 +804,114 @@ Tabs.Items:AddButton({
     end
 })
 -- // Exclusives Tab // --
--- Import Players
+-- Import Services
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+-- Ambil referensi ke player lokal
 local LocalPlayer = Players.LocalPlayer
 
--- Referensi ke objek di workspace
-local Active = workspace:WaitForChild("active")
-local ActiveBoats = Active:WaitForChild("boats")
+-- Cek apakah Utils tersedia
+local function getNetFunction()
+    if Utils and Utils.Net then
+        return Utils.Net
+    else
+        warn("[ERROR] Utils.Net tidak ditemukan! Menggunakan alternatif jika ada.")
+        return nil
+    end
+end
+
+-- Table untuk menyimpan daftar kapal yang dimiliki pemain
+local ownedBoats = {}
+
+-- Dropdown UI untuk memilih kapal
+local boatDropdown = Tabs.Exclusives:AddDropdown("BoatDropdown", {
+    Title = "Select Boat",
+    Values = {}, -- Akan diisi dengan daftar kapal
+    Multi = false,
+    Default = nil,
+})
+
+-- Fungsi untuk mengambil daftar kapal yang dimiliki pemain
+local function loadOwnedBoats()
+    -- Cek apakah pemain memiliki daftar kapal (contoh: dari inventory atau DataStore)
+    local success, boats = pcall(function()
+        return LocalPlayer:FindFirstChild("Boats") and LocalPlayer.Boats:GetChildren()
+    end)
+
+    if success and boats then
+        ownedBoats = {} -- Reset list kapal
+        for _, boat in ipairs(boats) do
+            table.insert(ownedBoats, boat.Name)
+        end
+
+        -- Update UI dropdown
+        boatDropdown:SetValues(ownedBoats)
+    else
+        warn("[ERROR] Gagal memuat daftar kapal!")
+    end
+end
+
+-- Fungsi untuk memunculkan kapal yang dipilih
+local function spawnBoat()
+    local selectedBoat = boatDropdown.Value
+
+    if not selectedBoat or selectedBoat == "" then
+        Fluent:Notify({
+            Title = "Error",
+            Content = "Please select a boat first!",
+            Duration = 5,
+            Type = "error"
+        })
+        return
+    end
+
+    -- Coba ambil Net function dari Utils
+    local NetFunction = getNetFunction()
+
+    if NetFunction then
+        local success, err = pcall(function()
+            NetFunction("RF", "Boats/Spawn"):InvokeServer(selectedBoat)
+            NetFunction("RE", "Boats/Close"):FireServer()
+            LocalPlayer.PlayerGui.hud.safezone.shipwright.Visible = false
+        end)
+
+        if not success then
+            Fluent:Notify({
+                Title = "Error",
+                Content = "Failed to spawn boat: " .. tostring(err),
+                Duration = 5,
+                Type = "error"
+            })
+        end
+        return
+    end
+
+    -- Jika Net dari Utils tidak ada, coba cari alternatif di ReplicatedStorage
+    local BoatsFolder = ReplicatedStorage:FindFirstChild("Boats")
+    if BoatsFolder and BoatsFolder:FindFirstChild("Spawn") then
+        local success, err = pcall(function()
+            BoatsFolder.Spawn:InvokeServer(selectedBoat)
+        end)
+
+        if not success then
+            Fluent:Notify({
+                Title = "Error",
+                Content = "Failed to spawn boat: " .. tostring(err),
+                Duration = 5,
+                Type = "error"
+            })
+        end
+    else
+        Fluent:Notify({
+            Title = "Error",
+            Content = "Boat spawn system not found!",
+            Duration = 5,
+            Type = "error"
+        })
+        warn("[ERROR] Boats/Spawn tidak ditemukan di ReplicatedStorage.")
+    end
+end
 
 -- UI Section untuk fitur eksklusif di Fluent UI Darwis
 local sectionExclus = Tabs.Exclusives:AddSection("Exclusives Features")
@@ -820,37 +921,14 @@ Tabs.Exclusives:AddButton({
     Title = "UI Buy Boat",
     Callback = function()
         LocalPlayer.PlayerGui.hud.safezone.shipwright.Visible = not LocalPlayer.PlayerGui.hud.safezone.shipwright.Visible
+        loadOwnedBoats() -- Ambil daftar kapal saat UI terbuka
     end
 })
 
--- Tombol untuk memanggil kapal
+-- Tombol untuk memanggil kapal yang dipilih dari dropdown
 Tabs.Exclusives:AddButton({
-    Title = "Spawn Boat",
-    Callback = function()
-        local BoatName = "DefaultBoat" -- Bisa diganti dengan input dari UI jika diperlukan
-
-        -- Kirim permintaan ke server untuk memunculkan kapal
-        local success, err = pcall(function()
-            Utils.Net("RF", "Boats/Spawn"):InvokeServer(BoatName)
-            Utils.Net("RE", "Boats/Close"):FireServer()
-            LocalPlayer.PlayerGui.hud.safezone.shipwright.Visible = false
-        end)
-
-        -- Jika terjadi error, tampilkan notifikasi di Fluent UI Darwis
-        if not success then
-            Fluent:Notify({
-                Title = "Error",
-                Content = "Failed to spawn boat: " .. tostring(err),
-                Duration = 5,
-                Type = "error"
-            })
-        end
-
-        -- Menunggu hingga kapal muncul di ActiveBoats
-        repeat
-            task.wait(0.5)
-        until ActiveBoats:FindFirstChild(LocalPlayer.Name)
-    end
+    Title = "Spawn Selected Boat",
+    Callback = spawnBoat
 })
 
 local section = Tabs.Misc:AddSection("Misc Feature (SOON)")
