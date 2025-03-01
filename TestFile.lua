@@ -287,9 +287,10 @@ local Options = Fluent.Options
 
     -- // Main Tab // --
     local Information = Tabs.Information:AddSection("Information (SOON)")
-    
-    local Config = Tabs.Config:AddSection("Setup")
-    -- Import DataStoreService
+
+ local Config = Tabs.Config:AddSection("Setup")
+
+-- Import DataStoreService
 local DataStoreService = game:GetService("DataStoreService")
 local fishZoneStore = DataStoreService:GetDataStore("FishingZones")
 
@@ -300,14 +301,26 @@ local fishZones = {}
 local success, storedZones = pcall(function()
     return fishZoneStore:GetAsync(LocalPlayer.UserId)
 end)
-if success and storedZones then
+
+if success and type(storedZones) == "table" then
     fishZones = storedZones
+else
+    fishZones = {} -- Pastikan fishZones tetap tabel valid
+end
+
+-- Fungsi untuk mendapatkan semua kunci dalam tabel
+local function getKeys(tbl)
+    local keys = {}
+    for key, _ in pairs(tbl) do
+        table.insert(keys, key)
+    end
+    return keys
 end
 
 -- UI Dropdown untuk memilih zona memancing
 local fishZoneDropdown = Tabs.Config:AddDropdown("FishZoneDropdown", {
     Title = "Select Fishing Zone",
-    Values = table.keys(fishZones),
+    Values = getKeys(fishZones), -- Menggunakan fungsi getKeys
     Multi = false,
     Default = nil,
 })
@@ -325,7 +338,7 @@ Tabs.Config:AddButton({
     Description = "Save current location as a Fishing Zone (Persistent)",
     Callback = function()
         local playerPos = LocalPlayer.Character.HumanoidRootPart.CFrame
-        local zoneName = zoneNameInput.Value ~= "" and zoneNameInput.Value or "Zone " .. tostring(#fishZones + 1)
+        local zoneName = zoneNameInput.Value ~= "" and zoneNameInput.Value or "Zone " .. tostring(#getKeys(fishZones) + 1)
         
         -- Simpan zona baru ke table
         fishZones[zoneName] = playerPos
@@ -337,8 +350,7 @@ Tabs.Config:AddButton({
         
         if saveSuccess then
             -- Update Dropdown UI
-            table.insert(fishZoneDropdown.Values, zoneName)
-            fishZoneDropdown:SetValues(fishZoneDropdown.Values)
+            fishZoneDropdown:SetValues(getKeys(fishZones)) -- Update dengan fungsi getKeys
             
             -- Notify user
             Fluent:Notify({
