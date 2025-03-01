@@ -295,7 +295,7 @@ local Options = Fluent.Options
             end
         })
     -- Config
-    local Config = Tabs.Config:AddSection("Setup")
+    local Config = Tabs.Config:AddSection("Save Zone")
     local fishZones = {}
     local fishZoneDropdown = Tabs.Config:AddDropdown("FishZoneDropdown", {
         Title = "Select Fishing Zone",
