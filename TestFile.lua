@@ -615,6 +615,7 @@ NoclipConnection = RunService.Stepped:Connect(function()
         end
     end
 end)
+local usefulSection = Tabs.CharacterTab:AddSection("Useful Features")
 local InfiniteOxygen = usefulSection:AddToggle("InfiniteOxygen", {Title = "Infinite Oxygen", Default = false})
 InfiniteOxygen:OnChanged(function(m)
     if m then
