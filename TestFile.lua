@@ -752,58 +752,72 @@ local autoSell = Tabs.Items:AddToggle("autoSell", {
 })
 
 task.spawn(function()
-    while task.wait(2) do 
+    while task.wait(1) do 
         if autoSell.Value then
             game:GetService("ReplicatedStorage"):WaitForChild("events"):WaitForChild("SellAll"):InvokeServer()
         end
     end
 end)
 
+-local section = Tabs.Items:AddSection("Automatically")
+
 Tabs.Items:AddButton({
     Title = "Appraise Held Fish",
-    Description = "Automatically appraises the fish you are holding",
+    Description = "Appraises the fish you are holding",
     Callback = function()
-        local _oldCF = LocalPlayerPawn.Character.HumanoidRootPart.CFrame
-        task.wait()
-        LocalPlayerPawn.Character.HumanoidRootPart.CFrame = CFrame.new(448.253815, 150.538727, 206.717392, 0.0551895462, -4.95227894e-08, -0.998475909, 3.75087801e-08, 1, -4.75251305e-08, 0.998475909, -3.4828723e-08, 0.0551895462)
-        task.wait(0.5)
-        workspace:WaitForChild("world"):WaitForChild("npcs"):WaitForChild("Appraiser"):WaitForChild("appraiser"):WaitForChild("appraise"):InvokeServer()
-        task.wait(0.5)
-        LocalPlayerPawn.Character.HumanoidRootPart.CFrame = _oldCF
+        workspace.world.npcs.Appraiser.appraiser.appraise:InvokeServer()
     end
 })
+
 
 local section = Tabs.Items:AddSection("Shop Items")
 
 -- Mengumpulkan daftar item dari folder
-local itemsFolder = game:GetService("ReplicatedStorage"):FindFirstChild("resources") and game:GetService("ReplicatedStorage").resources:FindFirstChild("items") and game:GetService("ReplicatedStorage").resources.items:FindFirstChild("items")
+-- Ambil folder Items di ReplicatedStorage
+local itemsFolder = game:GetService("ReplicatedStorage"):FindFirstChild("resources") and 
+                    game:GetService("ReplicatedStorage").resources:FindFirstChild("items") and 
+                    game:GetService("ReplicatedStorage").resources.items:FindFirstChild("items")
+
 local itemNames = {}
+local totemNames = {}
+local rodNames = {}
 
 if itemsFolder then
+    -- Ambil semua item kecuali Totem & Rods
     for _, item in pairs(itemsFolder:GetChildren()) do
-        if item:IsA("Folder") then
+        if item:IsA("Folder") and item.Name ~= "Totem" and item.Name ~= "Rods" then
             table.insert(itemNames, item.Name)
         end
     end
-else
-    warn("Items folder not found")
+
+    -- Ambil daftar Totem
+    local totemFolder = itemsFolder:FindFirstChild("Totem")
+    if totemFolder then
+        for _, totem in pairs(totemFolder:GetChildren()) do
+            if totem:IsA("Folder") then
+                table.insert(totemNames, totem.Name)
+            end
+        end
+    end
+
+    -- Ambil daftar Rods
+    local rodsFolder = itemsFolder:FindFirstChild("Rods")
+    if rodsFolder then
+        for _, rod in pairs(rodsFolder:GetChildren()) do
+            if rod:IsA("Folder") then
+                table.insert(rodNames, rod.Name)
+            end
+        end
+    end
 end
 
+-- Dropdown untuk Items (Kecuali Totem & Rods)
 local ItemDropdown = Tabs.Items:AddDropdown("ItemSelection", {
     Title = "Select an Item",
     Values = itemNames,
     Multi = false,
     Default = nil,
 })
-
--- Tabs.Items:AddTextbox({
---     Title = "Amount",
---     Default = "1",
---     TextDisappear = true,
---     Callback = function(Value)
---         selectedAmount = tonumber(Value) or 1
---     end
--- })
 
 Tabs.Items:AddButton({
     Title = "Buy Selected Item",
@@ -812,11 +826,48 @@ Tabs.Items:AddButton({
         local selectedItem = ItemDropdown.Value
         if selectedItem then
             game:GetService("ReplicatedStorage").events.purchase:FireServer(selectedItem, "Item", nil, selectedAmount)
-        else
-            warn("No item selected!")
         end
     end
 })
+
+-- Dropdown untuk Totem
+local TotemDropdown = Tabs.Items:AddDropdown("TotemSelection", {
+    Title = "Select a Totem",
+    Values = totemNames,
+    Multi = false,
+    Default = nil,
+})
+
+Tabs.Items:AddButton({
+    Title = "Buy Selected Totem",
+    Description = "Purchase the selected Totem.",
+    Callback = function()
+        local selectedTotem = TotemDropdown.Value
+        if selectedTotem then
+            game:GetService("ReplicatedStorage").events.purchase:FireServer(selectedTotem, "Totem", nil, selectedAmount)
+        end
+    end
+})
+
+-- Dropdown untuk Rods
+local RodsDropdown = Tabs.Items:AddDropdown("RodSelection", {
+    Title = "Select a Fishing Rod",
+    Values = rodNames,
+    Multi = false,
+    Default = nil,
+})
+
+Tabs.Items:AddButton({
+    Title = "Buy Selected Rod",
+    Description = "Purchase the selected fishing rod.",
+    Callback = function()
+        local selectedRod = RodsDropdown.Value
+        if selectedRod then
+            game:GetService("ReplicatedStorage").events.purchase:FireServer(selectedRod, "Rod", nil, selectedAmount)
+        end
+    end
+})
+
 -- // Exclusives Tab // --
 local sectionExclus = Tabs.Exclusives:AddSection("Exclusives Features")
 Tabs.Exclusives:AddButton({
