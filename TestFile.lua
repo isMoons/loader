@@ -759,8 +759,6 @@ task.spawn(function()
     end
 end)
 
--local section = Tabs.Items:AddSection("Automatically")
-
 Tabs.Items:AddButton({
     Title = "Appraise Held Fish",
     Description = "Automatically appraises the fish you are holding",
