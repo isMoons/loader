@@ -615,19 +615,6 @@ NoclipConnection = RunService.Stepped:Connect(function()
         end
     end
 end)
-local usefulSection = Tabs.CharacterTab:AddSection("Useful Features")
-local InfiniteOxygen = usefulSection:AddToggle("InfiniteOxygen", {Title = "Infinite Oxygen", Default = false})
-InfiniteOxygen:OnChanged(function(m)
-    if m then
-        local divingTank = Instance.new("Glue")
-        divingTank.Name = "DivingTank"
-        divingTank:SetAttribute("Tier", 9e9)
-        divingTank.Parent = LocalPlayer.Character
-    else
-        local existingTank = LocalPlayer.Character:FindFirstChild("DivingTank")
-        if existingTank then existingTank:Destroy() end
-    end
-end)
 local section = Tabs.Teleports:AddSection("Select Teleport")
 
 -- Menemukan folder teleportasi di dalam world
