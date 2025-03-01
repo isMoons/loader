@@ -294,6 +294,13 @@ local Options = Fluent.Options
                 setclipboard("https://discord.gg/dJmUxnAfbq")
             end
         })
+        Tabs.Information:AddButton({
+            Title = "Copy Youtube Link",
+            Description = "Support me with subscribe! :D",
+            Callback = function()
+                setclipboard("https://youtube.com/@ismoonss?si=Zb_BaENYI-P_ozM8?sub_confirmation=1")
+            end
+        })
     -- Config
     local Config = Tabs.Config:AddSection("Save Zone")
     local fishZones = {}
