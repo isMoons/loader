@@ -272,11 +272,10 @@ end
 
 local Tabs = { -- https://lucide.dev/icons/
     Profile = Window:AddTab({ Title = "Profile", Icon = Players:GetUserThumbnailAsync(LocalPlayer.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size100x100)}), 
-    Information = Window:AddTab({ Title = "Information", Icon = "book" }), 
+    CharacterTab = Window:AddTab({ Title = "Character", Icon = "user" }),
     Config = Window:AddTab({ Title = "Config", Icon = "boxes" }),
     Main = Window:AddTab({ Title = "Fishing", Icon = "anchor" }),
     Items = Window:AddTab({ Title = "Forge", Icon = "hammer" }), 
-    CharacterTab = Window:AddTab({ Title = "Character", Icon = "user" }),
     Teleports = Window:AddTab({ Title = "Teleports", Icon = "compass" }), 
     Exclusives = Window:AddTab({ Title = "Exclusives", Icon = "star" }), 
     Misc = Window:AddTab({ Title = "Misc", Icon = "package" }),
@@ -286,28 +285,7 @@ local Options = Fluent.Options
     local Profile = Tabs.Profile:AddSection("Profile (SOON)")
 
     -- // Main Tab // --
-    local Information = Tabs.Information:AddSection("Social Media - Ancestral")
-        Tabs.Information:AddButton({
-            Title = "Copy Discord link",
-            Description = "Join our discord to see next update!",
-            Callback = function()
-                setclipboard("https://discord.gg/dJmUxnAfbq")
-            end
-        })
-        Tabs.Information:AddButton({
-            Title = "Copy Youtube Link",
-            Description = "Support me with subscribe! :D",
-            Callback = function()
-                setclipboard("https://youtube.com/@ismoonss?si=Zb_BaENYI-P_ozM8?sub_confirmation=1")
-            end
-        })
-        Tabs.Information:AddButton({
-            Title = "Copy Tiktok Link",
-            Description = "Support me with follow tiktok! :D",
-            Callback = function()
-                setclipboard("https://www.tiktok.com/@ismoonss_")
-            end
-        })
+   
     -- Config
     local Config = Tabs.Config:AddSection("Save Zone")
     local fishZones = {}
