@@ -302,6 +302,14 @@ local Options = Fluent.Options
                 setclipboard("https://youtube.com/@ismoonss?si=Zb_BaENYI-P_ozM8?sub_confirmation=1")
             end
         })
+        local Information = Tabs.Information:AddSection("Tiktok")
+        Tabs.Information:AddButton({
+            Title = "Copy Tiktok Link",
+            Description = "Support me with follow tiktok! :D",
+            Callback = function()
+                setclipboard("https://www.tiktok.com/@ismoonss_")
+            end
+        })
     -- Config
     local Config = Tabs.Config:AddSection("Save Zone")
     local fishZones = {}
