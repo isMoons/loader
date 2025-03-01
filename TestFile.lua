@@ -331,6 +331,94 @@ local Options = Fluent.Options
             LocalPlayer.Character.HumanoidRootPart.CFrame = targetPos
         end
     end)
+     -- Atur Delay
+     local autoFishSettings = Tabs.Main:AddSection("Auto Fish Settings")
+     -- AutoCast
+     local autoCastDelaySlider = autoFishSettings:AddSlider("autocastdelay", {
+         Title = "Auto Cast Delay",
+         Suffix = "s",
+         Min = 0,
+         Max = 5,
+         Default = 0,
+         Rounding = 0.5
+     })
+     
+ local function StartAutoFishing()
+     spawn(function()
+         while autoCastEnabled do
+             pcall(function()
+                 local character = LocalPlayer.Character
+                 if character then
+                     local rodName = ReplicatedStorage.playerstats[LocalPlayer.Name].Stats.rod.Value
+                     local rod = character:FindFirstChildOfClass("Tool") or LocalPlayer.Backpack:FindFirstChild(rodName)
+ 
+                     if rod and rod.Parent == LocalPlayer.Backpack then
+                         character.Humanoid:EquipTool(rod)
+                     end
+ 
+                     if rod then
+                         local values = rod:FindFirstChild("values")
+                         local events = rod:FindFirstChild("events")
+ 
+                         if values and events and not values.casted.Value then
+                             events.cast:FireServer(100, 1)
+                         end
+                     end
+                 end
+             end)
+             task.wait(autoCastDelaySlider.Value) -- Menggunakan nilai dari slider sebagai delay
+         end
+     end)
+ end
+ 
+ autoCast:OnChanged(function()
+     autoCastEnabled = Options.autoCast.Value
+     if autoCastEnabled then
+         StartAutoFishing()
+     end
+ end)
+ -- AutoCast End
+     -- Auto Shake
+     local autoShakeDelaySlider = Tabs.Main:AddSlider("autoshakedelay", {
+         Title = "Auto Shake Delay",
+         Suffix = "ms",
+         Min = 0.3,
+         Max = 3,
+         Default = 0.5,
+         Rounding = 0.1
+     })
+     
+     autoShake:OnChanged(function()
+         pcall(function()
+             if Options.autoShake.Value then
+                 autoShakeEnabled = true
+                 task.defer(function()
+                     while autoShakeEnabled do
+                         local rod = LocalCharacter and LocalCharacter:FindFirstChildOfClass("Tool")
+                         if rod and rod:FindFirstChild("bobber") then
+                             rod.events.shake:FireServer()
+                         end
+                         -- Gunakan nilai dari slider sebagai delay dengan randomisasi untuk menghindari deteksi
+                         task.wait(math.random(autoShakeDelaySlider.Value, autoShakeDelaySlider.Value + 0.5))
+                     end
+                 end)
+             else
+                 autoShakeEnabled = false
+             end
+         end)
+     end)    
+     -- Auto Shake End
+     -- // Mode Tab // --
+     local section = Tabs.Main:AddSection("Mode Fishing")
+     local autoShakeMode = Tabs.Main:AddDropdown("autoShakeMode", {
+         Title = "Auto Shake Mode",
+         Values = {"Navigation"},
+         Multi = false,
+         Default = ShakeMode,
+     })
+     autoShakeMode:OnChanged(function(Value)
+         ShakeMode = Value
+     end)
     -- // // // Auto Cast // // // --
 local autoCastEnabled = false
     -- // // // Auto Shake // // // --
@@ -482,94 +570,7 @@ instaReelToggle:OnChanged(function()
         task.spawn(StartInstaReel)
     end
 end) 
-    -- Atur Delay
-    local autoFishSettings = Tabs.Main:AddSection("Auto Fish Settings")
-    -- AutoCast
-    local autoCastDelaySlider = autoFishSettings:AddSlider("autocastdelay", {
-        Title = "Auto Cast Delay",
-        Suffix = "s",
-        Min = 0,
-        Max = 5,
-        Default = 0,
-        Rounding = 0.5
-    })
-    
-local function StartAutoFishing()
-    spawn(function()
-        while autoCastEnabled do
-            pcall(function()
-                local character = LocalPlayer.Character
-                if character then
-                    local rodName = ReplicatedStorage.playerstats[LocalPlayer.Name].Stats.rod.Value
-                    local rod = character:FindFirstChildOfClass("Tool") or LocalPlayer.Backpack:FindFirstChild(rodName)
-
-                    if rod and rod.Parent == LocalPlayer.Backpack then
-                        character.Humanoid:EquipTool(rod)
-                    end
-
-                    if rod then
-                        local values = rod:FindFirstChild("values")
-                        local events = rod:FindFirstChild("events")
-
-                        if values and events and not values.casted.Value then
-                            events.cast:FireServer(100, 1)
-                        end
-                    end
-                end
-            end)
-            task.wait(autoCastDelaySlider.Value) -- Menggunakan nilai dari slider sebagai delay
-        end
-    end)
-end
-
-autoCast:OnChanged(function()
-    autoCastEnabled = Options.autoCast.Value
-    if autoCastEnabled then
-        StartAutoFishing()
-    end
-end)
--- AutoCast End
-    -- Auto Shake
-    local autoShakeDelaySlider = Tabs.Main:AddSlider("autoshakedelay", {
-        Title = "Auto Shake Delay",
-        Suffix = "ms",
-        Min = 0.3,
-        Max = 3,
-        Default = 0.5,
-        Rounding = 0.1
-    })
-    
-    autoShake:OnChanged(function()
-        pcall(function()
-            if Options.autoShake.Value then
-                autoShakeEnabled = true
-                task.defer(function()
-                    while autoShakeEnabled do
-                        local rod = LocalCharacter and LocalCharacter:FindFirstChildOfClass("Tool")
-                        if rod and rod:FindFirstChild("bobber") then
-                            rod.events.shake:FireServer()
-                        end
-                        -- Gunakan nilai dari slider sebagai delay dengan randomisasi untuk menghindari deteksi
-                        task.wait(math.random(autoShakeDelaySlider.Value, autoShakeDelaySlider.Value + 0.5))
-                    end
-                end)
-            else
-                autoShakeEnabled = false
-            end
-        end)
-    end)    
-    -- Auto Shake End
-    -- // Mode Tab // --
-    local section = Tabs.Main:AddSection("Mode Fishing")
-    local autoShakeMode = Tabs.Main:AddDropdown("autoShakeMode", {
-        Title = "Auto Shake Mode",
-        Values = {"Navigation"},
-        Multi = false,
-        Default = ShakeMode,
-    })
-    autoShakeMode:OnChanged(function(Value)
-        ShakeMode = Value
-    end)
+   
     local section = Tabs.CharacterTab:AddSection("Character")
     local IdentityHiderUI = Tabs.CharacterTab:AddToggle("IdentityHiderUI", {Title = "Protect Identity", Default = false})
     IdentityHiderUI:OnChanged(function()
