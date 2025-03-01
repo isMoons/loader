@@ -289,24 +289,18 @@ local Options = Fluent.Options
     local Information = Tabs.Information:AddSection("Information (SOON)")
     -- Config
     local Config = Tabs.Config:AddSection("Setup")
-    -- Table untuk menyimpan zona memancing
     local fishZones = {}
-    -- UI Dropdown untuk memilih zona memancing
     local fishZoneDropdown = Tabs.Config:AddDropdown("FishZoneDropdown", {
         Title = "Select Fishing Zone",
         Values = {},
         Multi = false,
         Default = nil,
     })
-    
-    -- Input Box untuk Nama Zona
     local zoneNameInput = Tabs.Config:AddInput("ZoneNameInput", {
         Title = "Zone Name",
         Default = "Fishing Spot",
         Placeholder = "Enter zone name...",
     })
-    
-    -- Button untuk membuat zona baru
     Tabs.Config:AddButton({
         Title = "Create Fish Zone",
         Description = "Save current location as a Fishing Zone (Will Be Deleted If Rejoin Game)",
