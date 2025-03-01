@@ -554,53 +554,16 @@ end)
             task.wait(0.01)
         end
     end)
-    local infOxygenToggle = Tabs.CharacterTab:AddToggle("InfOxygen", { Title = "Inf Oxygen", Default = false })
-infOxygenToggle:OnChanged(function()
-    if Options.InfOxygen.Value then
-        if LocalPlayerPawn.Character and LocalPlayerPawn.Character.Resources then
-            local resources = LocalPlayerPawn.Character.Resources
-            if resources:FindFirstChild("oxygen") then resources.oxygen.Enabled = false end
-            if resources:FindFirstChild("oxygen(peaks)") then resources["oxygen(peaks)"].Enabled = false end
-        end
-        CharAntiDrownCon = LocalPlayerPawn.Character.CharacterAdded:Connect(function()
-            if Options.InfOxygen.Value then
-                local resources = LocalPlayerPawn.Character.Resources
-                if resources:FindFirstChild("oxygen") then resources.oxygen.Enabled = false end
-                if resources:FindFirstChild("oxygen(peaks)") then resources["oxygen(peaks)"].Enabled = false end
-            end
-        end)
+    local InfiniteOxygen = usefulSection:AddToggle("InfiniteOxygen", {Title = "Infinite Oxygen", Default = false})
+InfiniteOxygen:OnChanged(function(m)
+    if m then
+        local divingTank = Instance.new("Glue")
+        divingTank.Name = "DivingTank"
+        divingTank:SetAttribute("Tier", 9e9)
+        divingTank.Parent = LocalPlayer.Character
     else
-        if CharAntiDrownCon then CharAntiDrownCon:Disconnect() end
-        if LocalPlayerPawn.Character and LocalPlayerPawn.Character.Resources then
-            local resources = LocalPlayerPawn.Character.Resources
-            if resources:FindFirstChild("oxygen") then resources.oxygen.Enabled = true end
-            if resources:FindFirstChild("oxygen(peaks)") then resources["oxygen(peaks)"].Enabled = true end
-        end
-    end
-end)
-
-local noTempToggle = Tabs.CharacterTab:AddToggle("NoTemp", { Title = "No Temperature", Default = false })
-noTempToggle:OnChanged(function()
-    if Options.NoTemp.Value then
-        if LocalPlayerPawn.Character and LocalPlayerPawn.Character.Resources then
-            local resources = LocalPlayerPawn.Character.Resources
-            if resources:FindFirstChild("temperature") then resources.temperature.Enabled = false end
-            if resources:FindFirstChild("temperature(heat)") then resources["temperature(heat)"].Enabled = false end
-        end
-        AntiTempCharConn = LocalPlayerPawn.Character.CharacterAdded:Connect(function()
-            if Options.NoTemp.Value then
-                local resources = LocalPlayerPawn.Character.Resources
-                if resources:FindFirstChild("temperature") then resources.temperature.Enabled = false end
-                if resources:FindFirstChild("temperature(heat)") then resources["temperature(heat)"].Enabled = false end
-            end
-        end)
-    else
-        if AntiTempCharConn then AntiTempCharConn:Disconnect() end
-        if LocalPlayerPawn.Character and LocalPlayerPawn.Character.Resources then
-            local resources = LocalPlayerPawn.Character.Resources
-            if resources:FindFirstChild("temperature") then resources.temperature.Enabled = true end
-            if resources:FindFirstChild("temperature(heat)") then resources["temperature(heat)"].Enabled = true end
-        end
+        local existingTank = LocalPlayer.Character:FindFirstChild("DivingTank")
+        if existingTank then existingTank:Destroy() end
     end
 end)
     local WalkOnWater = Tabs.CharacterTab:AddToggle("WalkOnWater", {Title = "Walk On Water", Default = false })
