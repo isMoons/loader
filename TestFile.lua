@@ -332,7 +332,7 @@ local Options = Fluent.Options
         end
     end)
      -- Atur Delay
-     local autoFishSettings = Tabs.Main:AddSection("Auto Fish Settings")
+     local autoFishSettings = Tabs.Config:AddSection("Auto Fish Settings")
      -- AutoCast
      local autoCastDelaySlider = autoFishSettings:AddSlider("autocastdelay", {
          Title = "Auto Cast Delay",
@@ -379,7 +379,7 @@ local Options = Fluent.Options
  end)
  -- AutoCast End
      -- Auto Shake
-     local autoShakeDelaySlider = Tabs.Main:AddSlider("autoshakedelay", {
+     local autoShakeDelaySlider = Tabs.Config:AddSlider("autoshakedelay", {
          Title = "Auto Shake Delay",
          Suffix = "ms",
          Min = 0.3,
@@ -409,7 +409,7 @@ local Options = Fluent.Options
      end)    
      -- Auto Shake End
      -- // Mode Tab // --
-     local section = Tabs.Main:AddSection("Mode Fishing")
+     local section = Tabs.Config:AddSection("Mode Fishing")
      local autoShakeMode = Tabs.Main:AddDropdown("autoShakeMode", {
          Title = "Auto Shake Mode",
          Values = {"Navigation"},
