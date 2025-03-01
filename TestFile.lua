@@ -554,18 +554,6 @@ end)
             task.wait(0.01)
         end
     end)
-    local InfiniteOxygen = usefulSection:AddToggle("InfiniteOxygen", {Title = "Infinite Oxygen", Default = false})
-InfiniteOxygen:OnChanged(function(m)
-    if m then
-        local divingTank = Instance.new("Glue")
-        divingTank.Name = "DivingTank"
-        divingTank:SetAttribute("Tier", 9e9)
-        divingTank.Parent = LocalPlayer.Character
-    else
-        local existingTank = LocalPlayer.Character:FindFirstChild("DivingTank")
-        if existingTank then existingTank:Destroy() end
-    end
-end)
     local WalkOnWater = Tabs.CharacterTab:AddToggle("WalkOnWater", {Title = "Walk On Water", Default = false })
     WalkOnWater:OnChanged(function()
         for i,v in pairs(workspace.zones.fishing:GetChildren()) do
@@ -625,6 +613,18 @@ NoclipConnection = RunService.Stepped:Connect(function()
                 end
             end
         end
+    end
+end)
+local InfiniteOxygen = usefulSection:AddToggle("InfiniteOxygen", {Title = "Infinite Oxygen", Default = false})
+InfiniteOxygen:OnChanged(function(m)
+    if m then
+        local divingTank = Instance.new("Glue")
+        divingTank.Name = "DivingTank"
+        divingTank:SetAttribute("Tier", 9e9)
+        divingTank.Parent = LocalPlayer.Character
+    else
+        local existingTank = LocalPlayer.Character:FindFirstChild("DivingTank")
+        if existingTank then existingTank:Destroy() end
     end
 end)
 local section = Tabs.Teleports:AddSection("Select Teleport")
