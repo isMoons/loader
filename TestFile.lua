@@ -286,8 +286,7 @@ local Options = Fluent.Options
     local Profile = Tabs.Profile:AddSection("Profile (SOON)")
 
     -- // Main Tab // --
-    local Information = Tabs.Information:AddSection("Information (SOON)")
-    do
+    local Information = Tabs.Information:AddSection("Information")
         Tabs.Information:AddButton({
             Title = "Copy Discord link",
             Description = "Join our discord to see next update!",
