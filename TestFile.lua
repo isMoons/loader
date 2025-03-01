@@ -763,9 +763,15 @@ end)
 
 Tabs.Items:AddButton({
     Title = "Appraise Held Fish",
-    Description = "Appraises the fish you are holding",
+    Description = "Automatically appraises the fish you are holding",
     Callback = function()
-        workspace.world.npcs.Appraiser.appraiser.appraise:InvokeServer()
+        local _oldCF = LocalPlayerPawn.Character.HumanoidRootPart.CFrame
+        task.wait()
+        LocalPlayerPawn.Character.HumanoidRootPart.CFrame = CFrame.new(448.253815, 150.538727, 206.717392, 0.0551895462, -4.95227894e-08, -0.998475909, 3.75087801e-08, 1, -4.75251305e-08, 0.998475909, -3.4828723e-08, 0.0551895462)
+        task.wait(0.5)
+        workspace:WaitForChild("world"):WaitForChild("npcs"):WaitForChild("Appraiser"):WaitForChild("appraiser"):WaitForChild("appraise"):InvokeServer()
+        task.wait(0.5)
+        LocalPlayerPawn.Character.HumanoidRootPart.CFrame = _oldCF
     end
 })
 
