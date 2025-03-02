@@ -1,7 +1,7 @@
 -- all dependencies backed up by 25ms :>
-local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+-- all dependencies backed up by 25ms :>
+local lib = loadstring(game:HttpGet("https://raw.githubusercontent.com/isMoons/loader/refs/heads/main/ObfuscatedSource"))()
 local FlagsManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/isMoons/loader/refs/heads/main/ObfuscatedConfigSource"))()
-
 -- print = function() end
 -- warn = function() end
 -- local PreventSkidsToMakeGayThings = loadstring(game:HttpGet("https://raw.githubusercontent.com/Hosvile/InfiniX/main/Library/Anti/AntiDebug/main.lua", true))()
@@ -103,11 +103,11 @@ local function getLunorIcon()
     return asset
 end
 
-local main = Fluent:Create({
-    Title = "Fisch " .. formatVersion(LRM_ScriptVersion),
-    Subtitle = "discord.gg/lunor",
-    Icon = getLunorIcon()
+local sections = lib:Load({
+    Title = 'Fisch '..formatVersion(LRM_ScriptVersion)..' | ' .. gradient("discord.gg/lunor").. " | ".. RoleChecker(),
+    ToggleButton = getLunorIcon()
 })
+
 
 
 
@@ -125,7 +125,7 @@ local tabs = {
     Config = main:Tab("Configs")
 }
 
-main:SelectTab()
+sections:SelectTab()
 
 
 
