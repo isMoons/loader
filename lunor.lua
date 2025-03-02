@@ -103,31 +103,29 @@ local function getLunorIcon()
     return asset
 end
 
-local main = {
-    AddTab = function() return { AddSection = function() return {} end } end,
-    SelectTab = function() end,
-    Notification = function() print("Notification Bypassed") end
-}
+local autofarm = lib:Load({
+    Title = 'Fisch '..formatVersion(LRM_ScriptVersion)..' | ' .. gradient("discord.gg/lunor").. " | ".. RoleChecker(),
+    ToggleButton = getLunorIcon()
+})
+
 
 
 
 
 local tabs = {
-    Main = main:AddTab("Main"),
-    AutoFarm = main:AddTab("Auto Farm"),
-    Items = main:AddTab("Items"),
-    Teleporation = main:AddTab("Teleports"),
-    Misc = main:AddTab("Misc"),
-    Webhook = main:AddTab("Webhook"),
-    Visuals = main:AddTab("Visuals"),
-    Config = main:AddTab("Configs")
+    AutoFarm = autofarm:AddTab("Auto Farm"),
+    Items = autofarm:AddTab("Items"),
+    Teleporation = autofarm:AddTab("Teleports"),
+    Misc = autofarm:AddTab("Misc"),
+    Webhook = autofarm:AddTab("Webhook"),
+    Visuals = autofarm:AddTab("Visuals"),
+    Config = autofarm:AddTab("Configs")
 }
-main:SelectTab()
+autofarm:SelectTab()
 
 
 
 local sections = {
-    Welcome = tabs.Main:AddSection({Defualt = true , Locked = true}),
     -- FishPremium = tabs.AutoFarm:AddSection({Title = gradient("Premium - Rod Exploit"), Description = "", Defualt = false , Locked = false}),
     Fish = tabs.AutoFarm:AddSection({Title = gradient("Auto Fishing"), Description = "", Defualt = true , Locked = false}),
     FishPlus = tabs.AutoFarm:AddSection({Title = gradient("Advanced Auto Fish"), Description = "", Defualt = false , Locked = false}),
