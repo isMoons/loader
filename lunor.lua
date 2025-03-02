@@ -1,5 +1,5 @@
 -- all dependencies backed up by 25ms :>
-local lib = loadstring(game:HttpGet("https://raw.githubusercontent.com/isMoons/loader/refs/heads/main/ObfuscatedSource"))()
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
 local FlagsManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/isMoons/loader/refs/heads/main/ObfuscatedConfigSource"))()
 
 -- print = function() end
@@ -103,25 +103,29 @@ local function getLunorIcon()
     return asset
 end
 
-local autofarm = lib:Load({
-    Title = 'Fisch '..formatVersion(LRM_ScriptVersion)..' | ' .. gradient("discord.gg/lunor").. " | ".. RoleChecker(),
-    ToggleButton = getLunorIcon()
+local main = Fluent:Create({
+    Title = "Fisch " .. formatVersion(LRM_ScriptVersion),
+    Subtitle = "discord.gg/lunor",
+    Icon = getLunorIcon()
 })
 
 
 
 
 
+
 local tabs = {
-    AutoFarm = autofarm:AddTab("Auto Farm"),
-    Items = autofarm:AddTab("Items"),
-    Teleporation = autofarm:AddTab("Teleports"),
-    Misc = autofarm:AddTab("Misc"),
-    Webhook = autofarm:AddTab("Webhook"),
-    Visuals = autofarm:AddTab("Visuals"),
-    Config = autofarm:AddTab("Configs")
+    Main = main:Tab("Main"),
+    AutoFarm = main:Tab("Auto Farm"),
+    Items = main:Tab("Items"),
+    Teleport = main:Tab("Teleports"),
+    Misc = main:Tab("Misc"),
+    Webhook = main:Tab("Webhook"),
+    Visuals = main:Tab("Visuals"),
+    Config = main:Tab("Configs")
 }
-autofarm:SelectTab()
+
+main:SelectTab()
 
 
 
