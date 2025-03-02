@@ -103,18 +103,11 @@ local function getLunorIcon()
     return asset
 end
 
-lib.Load = function(args)
-    return {}  -- Mengembalikan objek kosong agar script tidak error
+local lib = {}
+function lib:Load(args)
+    print("Bypassed Load Function")
+    return {}  -- Mengembalikan objek kosong agar script tetap bisa berjalan
 end
-
-local main = lib:Load({
-    Title = 'Fisch '..formatVersion(LRM_ScriptVersion)..' | ' .. gradient("discord.gg/lunor").. " | ".. RoleChecker(),
-    KeyAuth = "bypass_key",
-    ToggleButton = getLunorIcon()
-})
-
-
-
 
 local tabs = {
     Main = main:AddTab("Main"),
