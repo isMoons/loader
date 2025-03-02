@@ -103,10 +103,21 @@ local function getLunorIcon()
     return asset
 end
 
+local lib = lib or {}  -- Jika lib nil, buat lib sebagai table kosong
+function lib:Load(args)
+    print("Bypassed Load Function")
+    return {
+        AddTab = function() return { AddSection = function() return {} end } end,
+        SelectTab = function() end,
+        Notification = function() end
+    }  -- Mengembalikan objek kosong yang kompatibel
+end
+
 local main = lib:Load({
     Title = 'Fisch '..formatVersion(LRM_ScriptVersion)..' | ' .. gradient("discord.gg/lunor").. " | ".. RoleChecker(),
     ToggleButton = getLunorIcon()
 })
+
 
 
 local tabs = {
