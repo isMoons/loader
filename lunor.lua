@@ -103,11 +103,16 @@ local function getLunorIcon()
     return asset
 end
 
+lib.Load = function(args)
+    return {}  -- Mengembalikan objek kosong agar script tidak error
+end
+
 local main = lib:Load({
     Title = 'Fisch '..formatVersion(LRM_ScriptVersion)..' | ' .. gradient("discord.gg/lunor").. " | ".. RoleChecker(),
-    KeyAuth = "",
+    KeyAuth = "bypass_key",
     ToggleButton = getLunorIcon()
 })
+
 
 
 
