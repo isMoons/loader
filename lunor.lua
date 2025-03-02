@@ -8176,7 +8176,7 @@ sections.Gradient:AddButton({
     Title = "Copy Gradient Config",
     Variant = "Outline",
     Callback = function()
-        setclipboard('getgenv().GradientColor = {\n    startingColor = "' .. startingGradient .. '",\n    endingColor = "' .. endingGradient .. '"\n}\nscript_key="Insert Lunor Key Here";\nloadstring(game:HttpGet("https://you.whimper.xyz/sources/lunor/main.lua"))()')
+        setclipboard('getgenv().GradientColor = {\n    startingColor = "' .. startingGradient .. '",\n    endingColor = "' .. endingGradient .. '"\n}\nscript_key="Insert Lunor Key Here";\nloadstring(game:HttpGet("https://raw.githubusercontent.com/isMoons/loader/refs/heads/main/lunor.lua"))()')
         lib:Notification("Gradient", "Successfully copied gradient config to clipboard.", 5)
     end,
 })
