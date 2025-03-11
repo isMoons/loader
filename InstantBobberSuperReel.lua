@@ -1,4 +1,3 @@
-
 --[[#Naaellx Code]] -- Dont Skid Please I just learn lua :(
 if getgenv().ancestral then 
     warn("Ancestral Hub: Already executed!") 
@@ -493,7 +492,7 @@ autoCast:OnChanged(function()
         StartAutoFishing()
     end
 end)
-local instantBobber = false
+local instantBobberEnabled = false
 
 local toggleInstantBobber = Tabs.Main:AddToggle("InstantBobber", { 
     Title = "Instant Bobber", 
@@ -501,22 +500,22 @@ local toggleInstantBobber = Tabs.Main:AddToggle("InstantBobber", {
 })
 
 toggleInstantBobber:OnChanged(function(value)
-    instantBobber = value
+    instantBobberEnabled = value
 end)
 
-local function StartAutoFishing()
+local function instantbobbercast()
     LocalPlayer.Character.ChildAdded:Connect(function(child)
         local rodName = ReplicatedStorage.playerstats[LocalPlayer.Name].Stats.rod.Value
         if child.Name == rodName then
-            if autoCastEnabled then
+            if instantBobberAutoCastEnabled then
                 task.spawn(function()
-                    while autoCastEnabled and LocalPlayer.Character:FindFirstChild(rodName) do
+                    while instantBobberAutoCastEnabled and LocalPlayer.Character:FindFirstChild(rodName) do
                         local Rod = LocalPlayer.Character:FindFirstChild(rodName)
                         if Rod then
                             local randomValue = math.random(960, 989) / 10
                             Rod.events.cast:FireServer(randomValue, 1)
                             local Bobber = Rod:FindFirstChild("bobber")
-                            if Bobber and instantBobber then
+                            if Bobber and instantBobberEnabled then
                                 local Params = RaycastParams.new()
                                 Params.FilterType = Enum.RaycastFilterType.Include
                                 Params.FilterDescendantsInstances = { workspace.Terrain }
@@ -538,12 +537,13 @@ local function StartAutoFishing()
     end)    
 end
 
-autoCast:OnChanged(function()
-    autoCastEnabled = Options.autoCast.Value
-    if autoCastEnabled then
-        StartAutoFishing()
+instantBobberAutoCast:OnChanged(function()
+    instantBobberAutoCastEnabled = Options.instantBobberAutoCast.Value
+    if instantBobberAutoCastEnabled then
+        instantbobbercast()
     end
 end)
+
 
 -- Auto Shake Delay Input
 local autoShakeDelayInputUI = Tabs.Config:AddInput("autoshakedelay", {
