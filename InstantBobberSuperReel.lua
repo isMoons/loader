@@ -397,44 +397,64 @@
             task.spawn(StartAutoReel)
         end
     end)
-    -- FASTREELCODE
-    local function StartFastReel()
-        PlayerGui.ChildAdded:Connect(function(child)
-            if child.Name == "reel" then
-                task.spawn(function()
-                    while child.Parent == PlayerGui do
-                        if Options.fastReel.Value then
-                            local delay = tonumber(Options.fastreeldelay.Value) or 0
-                            task.wait(delay)
-                            local Bar = child:FindFirstChild("bar")
-                            if Bar then
-                                Bar:Destroy()
-                            end
-                            ReplicatedStorage.events["reelfinished "]:FireServer(100, true)
-                        end
-                        task.wait(0)
+-- FASTREELCODE
+local function StartFastReel()
+    spawn(function()
+        while Options.fastReel.Value do
+            local delay = tonumber(Options.fastreeldelay.Value) or 0
+            local perfectCatchChance = tonumber(Options.perfectCatchChance.Value) or 0.2
+            
+            task.wait(delay)
+            repeat
+                task.wait()
+                local ui = LocalPlayer.PlayerGui:FindFirstChild("reel")
+                if ui and ui:FindFirstChild("bar") then
+                    local b = ui:FindFirstChild("bar")
+                    if b:FindFirstChild("fish") and b:FindFirstChild("playerbar") then
+                        b:FindFirstChild("playerbar").Position = b:FindFirstChild("fish").Position
                     end
-                end)
-            end
-        end)
-    end 
-    
-    -- FASTREELCODE END
-    -- Fast Reel Toggle
-    local fastReelToggle = Tabs.Main:AddToggle("fastReel", { Title = "Fast Reel", Default = false })
-    fastReelToggle:OnChanged(function()
-        if Options.fastReel.Value then
-            task.spawn(StartFastReel)
+                    ReplicatedStorage:WaitForChild("events"):WaitForChild("reelfinished ")
+                        :FireServer(100, math.random() <= perfectCatchChance)
+                end
+                if not ui then ui = false end
+            until not ui
+            task.wait(perfectCatchChance / 100)
         end
     end)
-        local autoFishSettings = Tabs.Config:AddSection("Auto Fish Settings")
-        -- Auto Reel Delay Input
-        local fastReelDelayInputUI = Tabs.Config:AddInput("fastreeldelay", {
-            Title = "Fast Reel Delay",
-            Default = "0",  -- Set default value as string
-            Placeholder = "Enter delay in seconds",
-        })
-        
+end 
+-- FASTREELCODE END
+
+-- Fast Reel Toggle
+local fastReelToggle = Tabs.Main:AddToggle("fastReel", { Title = "Fast Reel", Default = false })
+fastReelToggle:OnChanged(function()
+    if Options.fastReel.Value then
+        task.spawn(StartFastReel)
+    end
+end)
+
+local autoFishSettings = Tabs.Config:AddSection("Auto Fish Settings")
+
+-- Auto Reel Delay Input
+local fastReelDelayInputUI = Tabs.Config:AddInput("fastreeldelay", {
+    Title = "Fast Reel Delay",
+    Default = "0",  -- Set default value as string
+    Placeholder = "Enter delay in seconds",
+})
+
+-- Perfect Catch Chance Toggle
+local perfectCatchToggle = Tabs.Main:AddToggle("perfectCatch", { Title = "Perfect Catch", Default = false })
+perfectCatchToggle:OnChanged(function()
+    if Options.perfectCatch.Value then
+        task.spawn(StartFastReel)
+    end
+end)
+
+-- Perfect Catch Chance Input
+local perfectCatchChanceInputUI = Tabs.Config:AddInput("perfectCatchChance", {
+    Title = "Perfect Catch Chance",
+    Default = "0.2",
+    Placeholder = "Enter chance (0.1-1)",
+})
     -- Auto Cast Delay Input
     local autoCastDelayInputUI = autoFishSettings:AddInput("autocastdelay", {
         Title = "Auto Cast Delay",
