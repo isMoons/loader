@@ -441,20 +441,13 @@ local fastReelDelayInputUI = Tabs.Config:AddInput("fastreeldelay", {
     Placeholder = "Enter delay in seconds",
 })
 
--- Perfect Catch Chance Toggle
-local perfectCatchToggle = Tabs.Main:AddToggle("perfectCatch", { Title = "Perfect Catch", Default = false })
-perfectCatchToggle:OnChanged(function()
-    if Options.perfectCatch.Value then
-        task.spawn(StartFastReel)
-    end
-end)
-
 -- Perfect Catch Chance Input
 local perfectCatchChanceInputUI = Tabs.Config:AddInput("perfectCatchChance", {
     Title = "Perfect Catch Chance",
     Default = "0.2",
     Placeholder = "Enter chance (0.1-1)",
 })
+
     -- Auto Cast Delay Input
     local autoCastDelayInputUI = autoFishSettings:AddInput("autocastdelay", {
         Title = "Auto Cast Delay",
