@@ -236,6 +236,8 @@
     local NpcFolder = Workspace:FindFirstChild("world"):WaitForChild("npcs")
     local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
     local screenGui = Instance.new("ScreenGui", PlayerGui)
+    local Backpack = LocalPlayer:WaitForChild("Backpack")
+
     -- local shadowCountLabel = Instance.new("TextLabel", screenGui)
     local RenderStepped = RunService.RenderStepped
     local WaitForSomeone = RenderStepped.Wait
@@ -279,7 +281,7 @@
     }
     local Options = Fluent.Options
         -- // // // Auto Cast // // // --
-        local autoCastEnabled = false
+    local autoCastEnabled = false
         -- // // // Auto Shake // // // --
     local autoShakeEnabled = false
     local autoShakeConnection
@@ -529,7 +531,7 @@
     autoShakeMode:OnChanged(function(Value)
         ShakeMode = Value
     end)
-    local FishingToggle = Tabs.Config:AddToggle("FishingToggle", {
+    local FishingToggle = Tabs.Main:AddToggle("FishingToggle", {
         Title = "Super Reel",
         Default = false
     })
@@ -582,7 +584,6 @@
             fishUI:Destroy()
         end
     end)
-    -- Freeze Code
     local FreezeCharacter = Tabs.Main:AddToggle("FreezeCharacter", {Title = "Freeze Character", Default = false })
     FreezeCharacter:OnChanged(function()
         local oldpos = HumanoidRootPart.CFrame
