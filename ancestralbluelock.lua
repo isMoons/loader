@@ -615,7 +615,7 @@ local Window = Luna:CreateWindow({
     LoadingTitle = "Ancestral Dev",
     LoadingSubtitle = ".gg/ancestral",
     ConfigSettings = {
-        RootFolder = "BillDevHub", 
+        RootFolder = "AncestralDev", 
         ConfigFolder = "Configs", 
         AutoLoadConfig = true 
     },
@@ -623,7 +623,7 @@ local Window = Luna:CreateWindow({
 
 Window:CreateHomeTab({
     SupportedExecutors = {"Delta", "Fluxus", "Codex", "Cryptic", "Vegax", "Trigon", "Synapse X", "Script-Ware", "KRNL", "Seliware", "Solara", "Xeno", "ZORARA", "Luna", "Nihon", "JJsploit", "AWP", "Wave", "Ronix"},
-    DiscordInvite = "https://discord.gg/D3T4ArjBqk",
+    DiscordInvite = "          https://discord.gg/dJmUxnAfbq?utm_medium=social&utm_source=heylink.me        ",
     Icon = 138057967505611,
 })
 local MainTab = Window:CreateTab({
