@@ -1,4 +1,4 @@
--- aing kan cuman nyoba nyoba memek
+-- aing kan cuman nyoba nyoba 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local player = Players.LocalPlayer
