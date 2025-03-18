@@ -1384,22 +1384,55 @@ for _, v in pairs(game.Players:GetPlayers()) do
     table.insert(persistentPlayers, v.Name)
 end
 
--- Menambahkan dropdown Player Teleport ke UI pada tab Config
-local playerTeleportDropdown = Tabs.Config:AddDropdown("PlayerTeleportDropdown", {
+-- Menambahkan dropdown Player Teleport ke UI pada tab Teleports
+local playerTeleportDropdown = Tabs.Teleports:AddDropdown("PlayerTeleportDropdown", {
     Title = "Player Teleport",
     Values = persistentPlayers,
     Multi = false,
     Default = nil,
 })
 
--- Callback untuk teleportasi ke pemain yang dipilih
-playerTeleportDropdown:OnChanged(function(selectedPlayer)
+-- Fungsi untuk teleportasi ke pemain yang dipilih
+local function teleportToSelection(selectedPlayer)
     if not selectedPlayer or selectedPlayer == "" then return end
     local targetPlayer = game.Players:FindFirstChild(selectedPlayer)
     if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
         LocalPlayer.Character.HumanoidRootPart.CFrame = targetPlayer.Character.HumanoidRootPart.CFrame
     end
-end)
+end
+
+-- Menambahkan event ketika dropdown berubah
+playerTeleportDropdown:OnChanged(teleportToSelection)
+
+-- Menambahkan tombol teleport jika menggunakan touchscreen
+if game:GetService("UserInputService").TouchEnabled then
+    Tabs.Teleports:AddButton({
+        Title = "Teleport To Selection",
+        Callback = function()
+            teleportToSelection(playerTeleportDropdown.Value)
+        end
+    })
+end
+
+-- Input untuk mencari pemain dalam daftar teleportasi
+Tabs.Teleports:AddInput("SearchBox", {
+    Title = "Search Player",
+    Default = "",
+    Placeholder = "Type to search...",
+    Numeric = false,
+    Callback = function(value)
+        -- Filter daftar pemain berdasarkan input
+        local filteredPlayers = {}
+        for _, player in ipairs(persistentPlayers) do
+            if player:lower():find(value:lower()) then
+                table.insert(filteredPlayers, player)
+            end
+        end
+
+        -- Perbarui dropdown dengan hasil filter
+        playerTeleportDropdown:SetValues(filteredPlayers)
+    end
+})
 
 -- Memperbarui daftar dropdown saat pemain masuk
 game.Players.PlayerAdded:Connect(function(player)
@@ -1415,6 +1448,7 @@ game.Players.PlayerRemoving:Connect(function(player)
         playerTeleportDropdown:SetValues(persistentPlayers)
     end
 end)
+
 
     local section = Tabs.Teleports:AddSection("Useful Feature")
     Tabs.Teleports:AddButton({
