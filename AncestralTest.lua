@@ -1055,6 +1055,7 @@ local autoShakeMode = Tabs.Config:AddDropdown("autoShakeMode", {
         end,
     })
     --[[#Naaellx Code]]
+    local section = Tabs.Teleports:AddSection("NPC Teleport")
 -- Menemukan folder NPC di dalam world
 local NpcFolder = Workspace:FindFirstChild("world"):WaitForChild("npcs")
 local npcList = {}
@@ -1091,7 +1092,6 @@ end)
 -- Dropdown untuk memilih NPC tujuan teleportasi
 local NpcTPDropdownUI = Tabs.Teleports:AddDropdown("NpcTPDropdownUI", {
     Title = "NPC Teleport",
-    Description = "Select an NPC to teleport to.",
     Values = npcList,
     Multi = false,
     Default = nil,
@@ -1146,7 +1146,7 @@ else
     -- Event dropdown berubah untuk langsung teleport
     NpcTPDropdownUI:OnChanged(teleportToNPC)
 end
-
+local section = Tabs.Teleports:AddSection("Island Teleport")
 -- Menemukan folder teleportasi di dalam world
 for i, v in pairs(TpSpotsFolder:GetChildren()) do
     if table.find(teleportSpots, v.Name) == nil then
@@ -1164,7 +1164,7 @@ local filteredSpots = teleportSpots
 
 -- Dropdown untuk teleportasi
 local IslandTPDropdownUI = Tabs.Teleports:AddDropdown("IslandTPDropdownUI", {
-    Title = "Area Teleport",
+    Title = "Island Teleport",
     Values = filteredSpots,
     Multi = false,
     Default = nil,
@@ -1217,7 +1217,7 @@ if game:GetService("UserInputService").TouchEnabled then
         end
     })
 end
-
+local section = Tabs.Teleports:AddSection("Fishing Zone")
 local FishingZonesFolder = game:GetService("Workspace").zones.fishing
 local FishingSpots = {}
 local SeenZones = {}  -- Tabel untuk melacak zona yang sudah dimasukkan
@@ -1377,6 +1377,7 @@ Tabs.Teleports:AddButton({
         autoTeleportEnabled = false
     end
 })
+local section = Tabs.Teleports:AddSection("Player Teleport")
 local persistentPlayers = {}
 
 -- Mengambil daftar pemain saat kode pertama kali dijalankan
@@ -1392,8 +1393,16 @@ local playerTeleportDropdown = Tabs.Teleports:AddDropdown("PlayerTeleportDropdow
     Default = nil,
 })
 
+-- Variabel untuk menyimpan pemain yang dipilih
+local selectedPlayer = nil
+
+-- Event ketika dropdown berubah (hanya menyimpan pemain yang dipilih, tidak langsung teleport)
+playerTeleportDropdown:OnChanged(function(value)
+    selectedPlayer = value
+end)
+
 -- Fungsi untuk teleportasi ke pemain yang dipilih
-local function teleportToSelection(selectedPlayer)
+local function teleportToSelection()
     if not selectedPlayer or selectedPlayer == "" then return end
     local targetPlayer = game.Players:FindFirstChild(selectedPlayer)
     if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
@@ -1401,20 +1410,13 @@ local function teleportToSelection(selectedPlayer)
     end
 end
 
--- Menambahkan event ketika dropdown berubah
-playerTeleportDropdown:OnChanged(teleportToSelection)
+Tabs.Teleports:AddButton({
+    Title = "Teleport To Selection",
+    Callback = function()
+        teleportToSelection()
+    end
+})
 
--- Menambahkan tombol teleport jika menggunakan touchscreen
-if game:GetService("UserInputService").TouchEnabled then
-    Tabs.Teleports:AddButton({
-        Title = "Teleport To Selection",
-        Callback = function()
-            teleportToSelection(playerTeleportDropdown.Value)
-        end
-    })
-end
-
--- Input untuk mencari pemain dalam daftar teleportasi
 Tabs.Teleports:AddInput("SearchBox", {
     Title = "Search Player",
     Default = "",
@@ -1429,18 +1431,15 @@ Tabs.Teleports:AddInput("SearchBox", {
             end
         end
 
-        -- Perbarui dropdown dengan hasil filter
         playerTeleportDropdown:SetValues(filteredPlayers)
     end
 })
 
--- Memperbarui daftar dropdown saat pemain masuk
 game.Players.PlayerAdded:Connect(function(player)
     table.insert(persistentPlayers, player.Name)
     playerTeleportDropdown:SetValues(persistentPlayers)
 end)
 
--- Memperbarui daftar dropdown saat pemain keluar
 game.Players.PlayerRemoving:Connect(function(player)
     local index = table.find(persistentPlayers, player.Name)
     if index then
