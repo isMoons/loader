@@ -1330,7 +1330,7 @@ local function FloatAboveZone(zoneName)
     local targetZone = FishingZonesFolder:FindFirstChild(zoneName)
     if not targetZone then return end
 
-    local adjustedHeight = (zoneName == "Orcas Pool" or zoneName == "Whales Pool") and 70 or floatHeight
+    local adjustedHeight = (zoneName == "Orcas Pool" or zoneName == "Whales Pool") and 75 or floatHeight
     
     HumanoidRootPart.CFrame = targetZone.CFrame + Vector3.new(0, adjustedHeight, 0)
 
