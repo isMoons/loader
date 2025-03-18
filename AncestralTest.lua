@@ -1330,7 +1330,7 @@ local function FloatAboveZone(zoneName)
     local targetZone = FishingZonesFolder:FindFirstChild(zoneName)
     if not targetZone then return end
 
-    local adjustedHeight = (zoneName == "Orcas Pool" or zoneName == "Whales Pool") and 60 or floatHeight
+    local adjustedHeight = (zoneName == "Orcas Pool" or zoneName == "Whales Pool") and 90 or floatHeight
     
     HumanoidRootPart.CFrame = targetZone.CFrame + Vector3.new(0, adjustedHeight, 0)
 
@@ -1574,7 +1574,7 @@ Tabs.Teleports:AddButton({
         local FishingZonesFolder = game:GetService("Workspace").zones.fishing
 
         local WorldEventTPDropdownUI = Tabs.Event:AddDropdown("WorldEventTPDropdownUI", {
-            Title = "Select World Event",
+            Title = "Select World Event [BUG]",
             Values = {
                 "Megalodon Default", "Megalodon Ancient", "Great White Shark", "Great Hammerhead Shark", 
                 "Whale Shark", "The Kraken Pool", "Ancient Kraken Pool", "Orcas Pool", "Ancient Orcas Pool", 
