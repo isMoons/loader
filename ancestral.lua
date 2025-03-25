@@ -1,3 +1,4 @@
+    -- [[Naaellx]] all my project will be continued join discord for free open source: https://discord.gg/eTVvgvRq4s
 --[[
 
    ▄████████ ███▄▄▄▄    ▄████████    ▄████████    ▄████████     ███        ▄████████    ▄████████  ▄█       
