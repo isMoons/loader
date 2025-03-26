@@ -32,7 +32,7 @@ local Tabs = {
 Window:SelectTab(1)
 
 Tabs.GeneralTab:Paragraph({
-    Title = "All my project Changed to ThanHub my project will continue after 6 months later.",
+    Title = "This project will continue join discord for new updates!",
 })
 Tabs.GeneralTab:Section({ Title = "Ancestral" })
 Tabs.GeneralTab:Button({
